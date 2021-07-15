@@ -626,9 +626,9 @@ static ssize_t do_nova_cow_file_write(struct file *filp,
 	struct nova_inode_info *si = NOVA_I(inode);
 	struct nova_inode_info_header *sih = &si->header;
 	struct super_block *sb = inode->i_sb;
-	struct nova_inode *pi, inode_copy;
+	struct nova_inode *pi, inode_copy;		// [yhc] pi: in-pmem nova_inode addr.
 	struct nova_file_write_entry entry_data;
-	struct nova_inode_update update;
+	struct nova_inode_update update;		// [yhc] update: transient DRAM structure that describes changes. 
 	ssize_t	    written = 0;
 	loff_t pos;
 	size_t count, offset, copied;
@@ -664,11 +664,11 @@ static ssize_t do_nova_cow_file_write(struct file *filp,
 	pos = *ppos;
 
 	if (filp->f_flags & O_APPEND)
-		pos = i_size_read(inode);
+		pos = i_size_read(inode);			// [yhc] i_size: file size in bytes.
 
-	count = len;								// [yhc] 'count' saves the input length info.
+	count = len;						// [yhc] 'count' saves the input length info.
 
-	pi = nova_get_block(sb, sih->pi_addr);
+	pi = nova_get_block(sb, sih->pi_addr);			// [yhc] pi_addr: address in PMEM of an inode.
 
 	/* nova_inode tail pointer will be updated and we make sure all other
 	 * inode fields are good before checksumming the whole structure
@@ -679,10 +679,10 @@ static ssize_t do_nova_cow_file_write(struct file *filp,
 		goto out;
 	}
 //^//   [yhc] Initializing essential local variables.
-	offset = pos & (sb->s_blocksize - 1);					// [yhc] extracts offset of edge block.
+	offset = pos & (sb->s_blocksize - 1);					// [yhc] extracts offset of edge block. 's_blocksize': block size in bytes.
 	num_blocks = ((count + offset - 1) >> sb->s_blocksize_bits) + 1;	// [yhc] calculates the necessary number of blocks.
 	total_blocks = num_blocks;						// [yhc] 'total_blocks' saves the necessary number of blocks.
-	start_blk = pos >> sb->s_blocksize_bits;				// [yhc] extracts the number of the starting block.
+	start_blk = pos >> sb->s_blocksize_bits;				// [yhc] extracts the index of the starting block.
 //^//
 	if (nova_check_overlap_vmas(sb, sih, start_blk, num_blocks)) {
 		nova_dbgv("COW write overlaps with vma: inode %lu, pgoff %lu, %lu blocks\n",

@@ -316,7 +316,7 @@ static inline void memset_nt(void *dest, uint32_t dword, size_t length)
  */
 static inline void *nova_get_block(struct super_block *sb, u64 block)
 {
-	struct nova_super_block *ps = nova_get_super(sb);
+	struct nova_super_block *ps = nova_get_super(sb);	// [yhc] address of super_block.
 
 	return block ? ((void *)ps + block) : NULL;
 }
