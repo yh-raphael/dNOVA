@@ -1,0 +1,338 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ARGBASE	checksum_32.S	/^#define ARGBASE 12$/;"	d
+ARGBASE	checksum_32.S	/^#define ARGBASE 16		$/;"	d
+ATOMIC64_EXPORT	atomic64_32.c	1;"	d	file:
+BEGIN	atomic64_386_32.S	/^#define BEGIN(op) \\$/;"	d
+CFLAGS_REMOVE_cmdline.o	Makefile	/^CFLAGS_REMOVE_cmdline.o = -pg$/;"	m
+CFLAGS_cmdline.o	Makefile	/^CFLAGS_cmdline.o := $(call cc-option, -fno-stack-protector)$/;"	m
+CREATE_TRACE_POINTS	msr.c	6;"	d	file:
+DST	checksum_32.S	/^#define DST(y...)			\\$/;"	d
+ENDP	atomic64_386_32.S	/^#define ENDP endp$/;"	d
+ENTER	putuser.S	/^#define ENTER	mov PER_CPU_VAR(current_task), %_ASM_BX$/;"	d
+EXIT	putuser.S	/^#define EXIT	ASM_CLAC ;	\\$/;"	d
+EXPORT_THUNK	retpoline.S	/^#define EXPORT_THUNK(reg) __EXPORT_THUNK(__x86_indirect_thunk_ ## reg)$/;"	d
+FP	checksum_32.S	/^#define FP		12$/;"	d
+GENERATE_THUNK	retpoline.S	/^#define GENERATE_THUNK(reg) THUNK reg ; EXPORT_THUNK(reg)$/;"	d
+I8254_CMD_READBACK	kaslr.c	31;"	d	file:
+I8254_PORT_CONTROL	kaslr.c	29;"	d	file:
+I8254_PORT_COUNTER0	kaslr.c	30;"	d	file:
+I8254_SELECT_COUNTER0	kaslr.c	32;"	d	file:
+I8254_STATUS_NOTREADY	kaslr.c	33;"	d	file:
+KASAN_SANITIZE_cmdline.o	Makefile	/^KASAN_SANITIZE_cmdline.o  := n$/;"	m
+KCOV_INSTRUMENT_cmdline.o	Makefile	/^KCOV_INSTRUMENT_cmdline.o := n$/;"	m
+KCOV_INSTRUMENT_delay.o	Makefile	/^KCOV_INSTRUMENT_delay.o	:= n$/;"	m
+MCSAFE_TEST_CTL	memcpy_64.S	/^MCSAFE_TEST_CTL$/;"	l
+PUT	clear_page_64.S	/^#define PUT(x) movq %rax,x*8(%rdi)$/;"	d
+REG_TYPE_BASE	insn-eval.c	/^	REG_TYPE_BASE,$/;"	e	enum:reg_type	file:
+REG_TYPE_INDEX	insn-eval.c	/^	REG_TYPE_INDEX,$/;"	e	enum:reg_type	file:
+REG_TYPE_RM	insn-eval.c	/^	REG_TYPE_RM = 0,$/;"	e	enum:reg_type	file:
+RET	atomic64_386_32.S	/^#define RET \\$/;"	d
+RET_ENDP	atomic64_386_32.S	/^#define RET_ENDP \\$/;"	d
+RET_ENDP	atomic64_386_32.S	/^RET_ENDP$/;"	l
+ROUND	checksum_32.S	/^#define ROUND(x) \\$/;"	d
+ROUND1	checksum_32.S	/^#define ROUND1(x) \\$/;"	d
+SRC	checksum_32.S	/^#define SRC(y...)			\\$/;"	d
+__ASM_HALF_REG	rwsem.S	/^#define __ASM_HALF_REG(reg)	__ASM_SEL(reg, e##reg)$/;"	d
+__ASM_HALF_SIZE	rwsem.S	/^#define __ASM_HALF_SIZE(inst)	__ASM_SEL(inst##w, inst##l)$/;"	d
+__EXPORT_THUNK	retpoline.S	/^#define __EXPORT_THUNK(sym) _ASM_NOKPROBE(sym); EXPORT_SYMBOL(sym)$/;"	d
+__clear_user	usercopy_32.c	/^EXPORT_SYMBOL(__clear_user);$/;"	v
+__clear_user	usercopy_32.c	/^__clear_user(void __user *to, unsigned long n)$/;"	f
+__clear_user	usercopy_64.c	/^EXPORT_SYMBOL(__clear_user);$/;"	v
+__clear_user	usercopy_64.c	/^unsigned long __clear_user(void __user *addr, unsigned long size)$/;"	f
+__cmdline_find_option	cmdline.c	/^__cmdline_find_option(const char *cmdline, int max_cmdline_size,$/;"	f	file:
+__cmdline_find_option_bool	cmdline.c	/^__cmdline_find_option_bool(const char *cmdline, int max_cmdline_size,$/;"	f	file:
+__const_udelay	delay.c	/^EXPORT_SYMBOL(__const_udelay);$/;"	v
+__const_udelay	delay.c	/^void __const_udelay(unsigned long xloops)$/;"	f
+__copy_from_user_ll_nocache_nozero	usercopy_32.c	/^EXPORT_SYMBOL(__copy_from_user_ll_nocache_nozero);$/;"	v
+__copy_from_user_ll_nocache_nozero	usercopy_32.c	/^unsigned long __copy_from_user_ll_nocache_nozero(void *to, const void __user *from,$/;"	f
+__copy_user	usercopy_32.c	299;"	d	file:
+__copy_user_flushcache	usercopy_64.c	/^long __copy_user_flushcache(void *dst, const void __user *src, unsigned size)$/;"	f
+__copy_user_intel	usercopy_32.c	/^__copy_user_intel(void __user *to, const void *from, unsigned long size)$/;"	f	file:
+__copy_user_intel_nocache	usercopy_32.c	/^static unsigned long __copy_user_intel_nocache(void *to,$/;"	f	file:
+__copy_user_ll	usercopy_32.c	/^EXPORT_SYMBOL(__copy_user_ll);$/;"	v
+__copy_user_ll	usercopy_32.c	/^unsigned long __copy_user_ll(void *to, const void *from, unsigned long n)$/;"	f
+__delay	delay.c	/^EXPORT_SYMBOL(__delay);$/;"	v
+__delay	delay.c	/^void __delay(unsigned long loops)$/;"	f
+__do_clear_user	usercopy_32.c	36;"	d	file:
+__flip_bit	msr.c	/^static inline int __flip_bit(u32 msr, u8 bit, bool set)$/;"	f	file:
+__get_immptr	insn.c	/^static int __get_immptr(struct insn *insn)$/;"	f	file:
+__get_immv	insn.c	/^static int __get_immv(struct insn *insn)$/;"	f	file:
+__get_immv32	insn.c	/^static int __get_immv32(struct insn *insn)$/;"	f	file:
+__get_moffset	insn.c	/^static int __get_moffset(struct insn *insn)$/;"	f	file:
+__get_next	insn.c	33;"	d	file:
+__memcpy_flushcache	usercopy_64.c	/^EXPORT_SYMBOL_GPL(__memcpy_flushcache);$/;"	v
+__memcpy_flushcache	usercopy_64.c	/^void __memcpy_flushcache(void *_dst, const void *_src, size_t size)$/;"	f
+__movsl_is_ok	usercopy_32.c	/^static inline int __movsl_is_ok(unsigned long a1, unsigned long a2, unsigned long n)$/;"	f	file:
+__ndelay	delay.c	/^EXPORT_SYMBOL(__ndelay);$/;"	v
+__ndelay	delay.c	/^void __ndelay(unsigned long nsecs)$/;"	f
+__peek_nbyte_next	insn.c	36;"	d	file:
+__rdmsr_on_cpu	msr-smp.c	/^static void __rdmsr_on_cpu(void *info)$/;"	f	file:
+__rdmsr_safe_on_cpu	msr-smp.c	/^static void __rdmsr_safe_on_cpu(void *info)$/;"	f	file:
+__rdmsr_safe_regs_on_cpu	msr-smp.c	/^static void __rdmsr_safe_regs_on_cpu(void *info)$/;"	f	file:
+__read_mostly	usercopy_32.c	/^struct movsl_mask movsl_mask __read_mostly;$/;"	v	typeref:struct:movsl_mask
+__rwmsr_on_cpus	msr-smp.c	/^static void __rwmsr_on_cpus(const struct cpumask *mask, u32 msr_no,$/;"	f	file:
+__udelay	delay.c	/^EXPORT_SYMBOL(__udelay);$/;"	v
+__udelay	delay.c	/^void __udelay(unsigned long usecs)$/;"	f
+__wbinvd	cache-smp.c	/^static void __wbinvd(void *dummy)$/;"	f	file:
+__wrmsr_on_cpu	msr-smp.c	/^static void __wrmsr_on_cpu(void *info)$/;"	f	file:
+__wrmsr_safe_on_cpu	msr-smp.c	/^static void __wrmsr_safe_on_cpu(void *info)$/;"	f	file:
+__wrmsr_safe_regs_on_cpu	msr-smp.c	/^static void __wrmsr_safe_regs_on_cpu(void *info)$/;"	f	file:
+_mmx_memcpy	mmx_32.c	/^EXPORT_SYMBOL(_mmx_memcpy);$/;"	v
+_mmx_memcpy	mmx_32.c	/^void *_mmx_memcpy(void *to, const void *from, size_t len)$/;"	f
+addsub_return	atomic64_cx8_32.S	/^addsub_return add add adc$/;"	l
+addsub_return	atomic64_cx8_32.S	/^addsub_return sub sub sbb$/;"	l
+arch_wb_cache_pmem	usercopy_64.c	/^EXPORT_SYMBOL_GPL(arch_wb_cache_pmem);$/;"	v
+arch_wb_cache_pmem	usercopy_64.c	/^void arch_wb_cache_pmem(void *addr, size_t size)$/;"	f
+bad_get_user	getuser.S	/^bad_get_user:$/;"	l
+bad_get_user_8	getuser.S	/^bad_get_user_8:$/;"	l
+bad_put_user	putuser.S	/^bad_put_user:$/;"	l
+check_seg_overrides	insn-eval.c	/^static bool check_seg_overrides(struct insn *insn, int regoff)$/;"	f	file:
+clean-files	Makefile	/^clean-files := inat-tables.c$/;"	m
+clean_cache_range	usercopy_64.c	/^static void clean_cache_range(void *addr, size_t size)$/;"	f	file:
+clear_user	usercopy_32.c	/^EXPORT_SYMBOL(clear_user);$/;"	v
+clear_user	usercopy_32.c	/^clear_user(void __user *to, unsigned long n)$/;"	f
+clear_user	usercopy_64.c	/^EXPORT_SYMBOL(clear_user);$/;"	v
+clear_user	usercopy_64.c	/^unsigned long clear_user(void __user *to, unsigned long n)$/;"	f
+cmd_inat_tables	Makefile	/^      cmd_inat_tables = $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@$/;"	m
+cmdline_find_option	cmdline.c	/^int cmdline_find_option(const char *cmdline, const char *option, char *buffer,$/;"	f
+cmdline_find_option_bool	cmdline.c	/^int cmdline_find_option_bool(const char *cmdline, const char *option)$/;"	f
+copy_from_user_nmi	usercopy.c	/^EXPORT_SYMBOL_GPL(copy_from_user_nmi);$/;"	v
+copy_from_user_nmi	usercopy.c	/^copy_from_user_nmi(void *to, const void __user *from, unsigned long n)$/;"	f
+copy_user_handle_tail	usercopy_64.c	/^copy_user_handle_tail(char *to, char *from, unsigned len)$/;"	f
+csum_ipv6_magic	csum-wrappers_64.c	/^EXPORT_SYMBOL(csum_ipv6_magic);$/;"	v
+csum_ipv6_magic	csum-wrappers_64.c	/^__sum16 csum_ipv6_magic(const struct in6_addr *saddr,$/;"	f
+csum_partial	csum-partial_64.c	/^EXPORT_SYMBOL(csum_partial);$/;"	v
+csum_partial	csum-partial_64.c	/^__wsum csum_partial(const void *buff, int len, __wsum sum)$/;"	f
+csum_partial_copy_from_user	csum-wrappers_64.c	/^EXPORT_SYMBOL(csum_partial_copy_from_user);$/;"	v
+csum_partial_copy_from_user	csum-wrappers_64.c	/^csum_partial_copy_from_user(const void __user *src, void *dst,$/;"	f
+csum_partial_copy_nocheck	csum-wrappers_64.c	/^EXPORT_SYMBOL(csum_partial_copy_nocheck);$/;"	v
+csum_partial_copy_nocheck	csum-wrappers_64.c	/^csum_partial_copy_nocheck(const void *src, void *dst, int len, __wsum sum)$/;"	f
+csum_partial_copy_to_user	csum-wrappers_64.c	/^EXPORT_SYMBOL(csum_partial_copy_to_user);$/;"	v
+csum_partial_copy_to_user	csum-wrappers_64.c	/^csum_partial_copy_to_user(const void *src, void __user *dst,$/;"	f
+debug_putstr	kaslr.c	24;"	d	file:
+delay_fn	delay.c	/^static void (*delay_fn)(unsigned long) = delay_loop;$/;"	v	file:
+delay_loop	delay.c	/^static void delay_loop(unsigned long loops)$/;"	f	file:
+delay_mwaitx	delay.c	/^static void delay_mwaitx(unsigned long __loops)$/;"	f	file:
+delay_tsc	delay.c	/^static void delay_tsc(unsigned long __loops)$/;"	f	file:
+do_csum	csum-partial_64.c	/^static unsigned do_csum(const unsigned char *buff, unsigned len)$/;"	f	file:
+do_trace_rdpmc	msr.c	/^EXPORT_SYMBOL(do_trace_rdpmc);$/;"	v
+do_trace_rdpmc	msr.c	/^void do_trace_rdpmc(unsigned counter, u64 val, int failed)$/;"	f
+do_trace_read_msr	msr.c	/^EXPORT_SYMBOL(do_trace_read_msr);$/;"	v
+do_trace_read_msr	msr.c	/^void do_trace_read_msr(unsigned int msr, u64 val, int failed)$/;"	f
+do_trace_write_msr	msr.c	/^EXPORT_SYMBOL(do_trace_write_msr);$/;"	v
+do_trace_write_msr	msr.c	/^void do_trace_write_msr(unsigned int msr, u64 val, int failed)$/;"	f
+done	msr-smp.c	/^	struct completion	done;$/;"	m	struct:msr_info_completion	typeref:struct:msr_info_completion::completion	file:
+fast_clear_page	mmx_32.c	/^static void fast_clear_page(void *page)$/;"	f	file:
+fast_copy_page	mmx_32.c	/^static void fast_copy_page(void *to, void *from)$/;"	f	file:
+from32to16	csum-partial_64.c	/^static inline unsigned short from32to16(unsigned a) $/;"	f	file:
+get_addr_ref_16	insn-eval.c	/^static void __user *get_addr_ref_16(struct insn *insn, struct pt_regs *regs)$/;"	f	file:
+get_addr_ref_32	insn-eval.c	/^static void __user *get_addr_ref_32(struct insn *insn, struct pt_regs *regs)$/;"	f	file:
+get_addr_ref_64	insn-eval.c	/^static void __user *get_addr_ref_64(struct insn *insn, struct pt_regs *regs)$/;"	f	file:
+get_boot_seed	kaslr.c	26;"	d	file:
+get_desc	insn-eval.c	/^static struct desc_struct *get_desc(unsigned short sel)$/;"	f	file:
+get_eff_addr_modrm	insn-eval.c	/^static int get_eff_addr_modrm(struct insn *insn, struct pt_regs *regs,$/;"	f	file:
+get_eff_addr_modrm_16	insn-eval.c	/^static int get_eff_addr_modrm_16(struct insn *insn, struct pt_regs *regs,$/;"	f	file:
+get_eff_addr_reg	insn-eval.c	/^static int get_eff_addr_reg(struct insn *insn, struct pt_regs *regs,$/;"	f	file:
+get_eff_addr_sib	insn-eval.c	/^static int get_eff_addr_sib(struct insn *insn, struct pt_regs *regs,$/;"	f	file:
+get_next	insn.c	39;"	d	file:
+get_reg_offset	insn-eval.c	/^static int get_reg_offset(struct insn *insn, struct pt_regs *regs,$/;"	f	file:
+get_reg_offset_16	insn-eval.c	/^static int get_reg_offset_16(struct insn *insn, struct pt_regs *regs,$/;"	f	file:
+get_seg_base_limit	insn-eval.c	/^static int get_seg_base_limit(struct insn *insn, struct pt_regs *regs,$/;"	f	file:
+get_seg_limit	insn-eval.c	/^static unsigned long get_seg_limit(struct pt_regs *regs, int seg_reg_idx)$/;"	f	file:
+get_seg_reg_override_idx	insn-eval.c	/^static int get_seg_reg_override_idx(struct insn *insn)$/;"	f	file:
+get_segment_selector	insn-eval.c	/^static short get_segment_selector(struct pt_regs *regs, int seg_reg_idx)$/;"	f	file:
+has_cpuflag	kaslr.c	25;"	d	file:
+i8254	kaslr.c	/^static inline u16 i8254(void)$/;"	f	file:
+inat_avx_tables	inat-tables.c	/^const insn_attr_t * const inat_avx_tables[X86_VEX_M_MAX + 1][INAT_LSTPFX_MAX + 1] = {$/;"	v
+inat_escape_table_1	inat-tables.c	/^const insn_attr_t inat_escape_table_1[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_1_1	inat-tables.c	/^const insn_attr_t inat_escape_table_1_1[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_1_2	inat-tables.c	/^const insn_attr_t inat_escape_table_1_2[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_1_3	inat-tables.c	/^const insn_attr_t inat_escape_table_1_3[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_2	inat-tables.c	/^const insn_attr_t inat_escape_table_2[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_2_1	inat-tables.c	/^const insn_attr_t inat_escape_table_2_1[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_2_2	inat-tables.c	/^const insn_attr_t inat_escape_table_2_2[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_2_3	inat-tables.c	/^const insn_attr_t inat_escape_table_2_3[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_3	inat-tables.c	/^const insn_attr_t inat_escape_table_3[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_3_1	inat-tables.c	/^const insn_attr_t inat_escape_table_3_1[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_table_3_3	inat-tables.c	/^const insn_attr_t inat_escape_table_3_3[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_escape_tables	inat-tables.c	/^const insn_attr_t * const inat_escape_tables[INAT_ESC_MAX + 1][INAT_LSTPFX_MAX + 1] = {$/;"	v
+inat_get_avx_attribute	inat.c	/^insn_attr_t inat_get_avx_attribute(insn_byte_t opcode, insn_byte_t vex_m,$/;"	f
+inat_get_escape_attribute	inat.c	/^insn_attr_t inat_get_escape_attribute(insn_byte_t opcode, int lpfx_id,$/;"	f
+inat_get_group_attribute	inat.c	/^insn_attr_t inat_get_group_attribute(insn_byte_t modrm, int lpfx_id,$/;"	f
+inat_get_last_prefix_id	inat.c	/^int inat_get_last_prefix_id(insn_byte_t last_pfx)$/;"	f
+inat_get_opcode_attribute	inat.c	/^insn_attr_t inat_get_opcode_attribute(insn_byte_t opcode)$/;"	f
+inat_group_table_10	inat-tables.c	/^const insn_attr_t inat_group_table_10[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_11	inat-tables.c	/^const insn_attr_t inat_group_table_11[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_13	inat-tables.c	/^const insn_attr_t inat_group_table_13[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_14	inat-tables.c	/^const insn_attr_t inat_group_table_14[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_14_1	inat-tables.c	/^const insn_attr_t inat_group_table_14_1[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_15	inat-tables.c	/^const insn_attr_t inat_group_table_15[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_15_1	inat-tables.c	/^const insn_attr_t inat_group_table_15_1[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_16	inat-tables.c	/^const insn_attr_t inat_group_table_16[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_16_1	inat-tables.c	/^const insn_attr_t inat_group_table_16_1[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_19	inat-tables.c	/^const insn_attr_t inat_group_table_19[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_19_2	inat-tables.c	/^const insn_attr_t inat_group_table_19_2[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_22	inat-tables.c	/^const insn_attr_t inat_group_table_22[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_22_1	inat-tables.c	/^const insn_attr_t inat_group_table_22_1[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_22_2	inat-tables.c	/^const insn_attr_t inat_group_table_22_2[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_23	inat-tables.c	/^const insn_attr_t inat_group_table_23[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_23_1	inat-tables.c	/^const insn_attr_t inat_group_table_23_1[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_24	inat-tables.c	/^const insn_attr_t inat_group_table_24[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_24_1	inat-tables.c	/^const insn_attr_t inat_group_table_24_1[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_25	inat-tables.c	/^const insn_attr_t inat_group_table_25[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_4	inat-tables.c	/^const insn_attr_t inat_group_table_4[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_5	inat-tables.c	/^const insn_attr_t inat_group_table_5[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_6	inat-tables.c	/^const insn_attr_t inat_group_table_6[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_7	inat-tables.c	/^const insn_attr_t inat_group_table_7[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_8	inat-tables.c	/^const insn_attr_t inat_group_table_8[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_table_9	inat-tables.c	/^const insn_attr_t inat_group_table_9[INAT_GROUP_TABLE_SIZE] = {$/;"	v
+inat_group_tables	inat-tables.c	/^const insn_attr_t * const inat_group_tables[INAT_GRP_MAX + 1][INAT_LSTPFX_MAX + 1] = {$/;"	v
+inat_primary_table	inat-tables.c	/^const insn_attr_t inat_primary_table[INAT_OPCODE_TABLE_SIZE] = {$/;"	v
+inat_tables_maps	Makefile	/^inat_tables_maps = $(srctree)\/arch\/x86\/lib\/x86-opcode-map.txt$/;"	m
+inat_tables_script	Makefile	/^inat_tables_script = $(srctree)\/arch\/x86\/tools\/gen-insn-attr-x86.awk$/;"	m
+incdec_return	atomic64_cx8_32.S	/^incdec_return dec sub sbb$/;"	l
+incdec_return	atomic64_cx8_32.S	/^incdec_return inc add adc$/;"	l
+insn_get_addr_ref	insn-eval.c	/^void __user *insn_get_addr_ref(struct insn *insn, struct pt_regs *regs)$/;"	f
+insn_get_code_seg_params	insn-eval.c	/^int insn_get_code_seg_params(struct pt_regs *regs)$/;"	f
+insn_get_displacement	insn.c	/^void insn_get_displacement(struct insn *insn)$/;"	f
+insn_get_immediate	insn.c	/^void insn_get_immediate(struct insn *insn)$/;"	f
+insn_get_length	insn.c	/^void insn_get_length(struct insn *insn)$/;"	f
+insn_get_modrm	insn.c	/^void insn_get_modrm(struct insn *insn)$/;"	f
+insn_get_modrm_rm_off	insn-eval.c	/^int insn_get_modrm_rm_off(struct insn *insn, struct pt_regs *regs)$/;"	f
+insn_get_opcode	insn.c	/^void insn_get_opcode(struct insn *insn)$/;"	f
+insn_get_prefixes	insn.c	/^void insn_get_prefixes(struct insn *insn)$/;"	f
+insn_get_seg_base	insn-eval.c	/^unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx)$/;"	f
+insn_get_sib	insn.c	/^void insn_get_sib(struct insn *insn)$/;"	f
+insn_init	insn.c	/^void insn_init(struct insn *insn, const void *kaddr, int buf_len, int x86_64)$/;"	f
+insn_rip_relative	insn.c	/^int insn_rip_relative(struct insn *insn)$/;"	f
+ip_compute_csum	csum-partial_64.c	/^EXPORT_SYMBOL(ip_compute_csum);$/;"	v
+ip_compute_csum	csum-partial_64.c	/^__sum16 ip_compute_csum(const void *buff, int len)$/;"	f
+is_string_insn	insn-eval.c	/^static bool is_string_insn(struct insn *insn)$/;"	f	file:
+kaslr_get_random_long	kaslr.c	/^unsigned long kaslr_get_random_long(const char *purpose)$/;"	f
+lib-y	Makefile	/^lib-y := delay.o misc.o cmdline.o cpu.o$/;"	m
+mcsafe_handle_tail	usercopy_64.c	/^mcsafe_handle_tail(char *to, char *from, unsigned len)$/;"	f
+memchr	string_32.c	/^EXPORT_SYMBOL(memchr);$/;"	v
+memchr	string_32.c	/^void *memchr(const void *cs, int c, size_t count)$/;"	f
+memcpy	memcpy_32.c	/^EXPORT_SYMBOL(memcpy);$/;"	v
+memcpy	memcpy_32.c	/^__visible void *memcpy(void *to, const void *from, size_t n)$/;"	f
+memcpy	memcpy_32.c	5;"	d	file:
+memcpy_fromio	iomem.c	/^EXPORT_SYMBOL(memcpy_fromio);$/;"	v
+memcpy_fromio	iomem.c	/^void memcpy_fromio(void *to, const volatile void __iomem *from, size_t n)$/;"	f
+memcpy_page_flushcache	usercopy_64.c	/^void memcpy_page_flushcache(char *to, struct page *page, size_t offset,$/;"	f
+memcpy_toio	iomem.c	/^EXPORT_SYMBOL(memcpy_toio);$/;"	v
+memcpy_toio	iomem.c	/^void memcpy_toio(volatile void __iomem *to, const void *from, size_t n)$/;"	f
+memmove	memcpy_32.c	/^EXPORT_SYMBOL(memmove);$/;"	v
+memmove	memcpy_32.c	/^__visible void *memmove(void *dest, const void *src, size_t n)$/;"	f
+memscan	string_32.c	/^EXPORT_SYMBOL(memscan);$/;"	v
+memscan	string_32.c	/^void *memscan(void *addr, int c, size_t size)$/;"	f
+memset	memcpy_32.c	/^EXPORT_SYMBOL(memset);$/;"	v
+memset	memcpy_32.c	/^__visible void *memset(void *s, int c, size_t count)$/;"	f
+memset	memcpy_32.c	6;"	d	file:
+memset_io	iomem.c	/^EXPORT_SYMBOL(memset_io);$/;"	v
+memset_io	iomem.c	/^void memset_io(volatile void __iomem *a, int b, size_t c)$/;"	f
+mmx_clear_page	mmx_32.c	/^EXPORT_SYMBOL(mmx_clear_page);$/;"	v
+mmx_clear_page	mmx_32.c	/^void mmx_clear_page(void *page)$/;"	f
+mmx_copy_page	mmx_32.c	/^EXPORT_SYMBOL(mmx_copy_page);$/;"	v
+mmx_copy_page	mmx_32.c	/^void mmx_copy_page(void *to, void *from)$/;"	f
+movs	iomem.c	5;"	d	file:
+movsl_is_ok	usercopy_32.c	29;"	d	file:
+msr	msr-smp.c	/^	struct msr_info		msr;$/;"	m	struct:msr_info_completion	typeref:struct:msr_info_completion::msr_info	file:
+msr_clear_bit	msr.c	/^int msr_clear_bit(u32 msr, u8 bit)$/;"	f
+msr_info_completion	msr-smp.c	/^struct msr_info_completion {$/;"	s	file:
+msr_read	msr.c	/^int msr_read(u32 msr, struct msr *m)$/;"	f
+msr_set_bit	msr.c	/^int msr_set_bit(u32 msr, u8 bit)$/;"	f
+msr_write	msr.c	/^int msr_write(u32 msr, struct msr *m)$/;"	f
+msrs_alloc	msr.c	/^EXPORT_SYMBOL(msrs_alloc);$/;"	v
+msrs_alloc	msr.c	/^struct msr *msrs_alloc(void)$/;"	f
+msrs_free	msr.c	/^EXPORT_SYMBOL(msrs_free);$/;"	v
+msrs_free	msr.c	/^void msrs_free(struct msr *msrs)$/;"	f
+myisspace	cmdline.c	/^static inline int myisspace(u8 c)$/;"	f	file:
+num_digits	misc.c	/^int num_digits(int val)$/;"	f
+op_safe_regs	msr-reg.S	/^op_safe_regs rdmsr$/;"	l
+op_safe_regs	msr-reg.S	/^op_safe_regs wrmsr$/;"	l
+override_function_with_return	error-inject.c	/^NOKPROBE_SYMBOL(override_function_with_return);$/;"	v
+override_function_with_return	error-inject.c	/^void override_function_with_return(struct pt_regs *regs)$/;"	f
+peek_nbyte_next	insn.c	42;"	d	file:
+peek_next	insn.c	45;"	d	file:
+pr_fmt	insn-eval.c	18;"	d	file:
+pr_fmt	insn-eval.c	19;"	d	file:
+quiet_cmd_inat_tables	Makefile	/^quiet_cmd_inat_tables = GEN     $@$/;"	m
+rdmsr_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(rdmsr_on_cpu);$/;"	v
+rdmsr_on_cpu	msr-smp.c	/^int rdmsr_on_cpu(unsigned int cpu, u32 msr_no, u32 *l, u32 *h)$/;"	f
+rdmsr_on_cpus	msr-smp.c	/^EXPORT_SYMBOL(rdmsr_on_cpus);$/;"	v
+rdmsr_on_cpus	msr-smp.c	/^void rdmsr_on_cpus(const struct cpumask *mask, u32 msr_no, struct msr *msrs)$/;"	f
+rdmsr_safe_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(rdmsr_safe_on_cpu);$/;"	v
+rdmsr_safe_on_cpu	msr-smp.c	/^int rdmsr_safe_on_cpu(unsigned int cpu, u32 msr_no, u32 *l, u32 *h)$/;"	f
+rdmsr_safe_regs	msr-reg-export.c	/^EXPORT_SYMBOL(rdmsr_safe_regs);$/;"	v
+rdmsr_safe_regs_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(rdmsr_safe_regs_on_cpu);$/;"	v
+rdmsr_safe_regs_on_cpu	msr-smp.c	/^int rdmsr_safe_regs_on_cpu(unsigned int cpu, u32 *regs)$/;"	f
+rdmsrl_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(rdmsrl_on_cpu);$/;"	v
+rdmsrl_on_cpu	msr-smp.c	/^int rdmsrl_on_cpu(unsigned int cpu, u32 msr_no, u64 *q)$/;"	f
+rdmsrl_safe_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(rdmsrl_safe_on_cpu);$/;"	v
+rdmsrl_safe_on_cpu	msr-smp.c	/^int rdmsrl_safe_on_cpu(unsigned int cpu, u32 msr_no, u64 *q)$/;"	f
+rdpmc	msr.c	/^EXPORT_TRACEPOINT_SYMBOL(rdpmc);$/;"	v
+read_current_timer	delay.c	/^int read_current_timer(unsigned long *timer_val)$/;"	f
+read_msr	msr.c	/^EXPORT_TRACEPOINT_SYMBOL(read_msr);$/;"	v
+reg_type	insn-eval.c	/^enum reg_type {$/;"	g	file:
+rep_movs	iomem.c	/^static __always_inline void rep_movs(void *to, const void *from, size_t n)$/;"	f	file:
+resolve_default_seg	insn-eval.c	/^static int resolve_default_seg(struct insn *insn, struct pt_regs *regs, int off)$/;"	f	file:
+resolve_seg_reg	insn-eval.c	/^static int resolve_seg_reg(struct insn *insn, struct pt_regs *regs, int regoff)$/;"	f	file:
+restore_common_regs	rwsem.S	/^#define restore_common_regs \\$/;"	d
+save_common_regs	rwsem.S	/^#define save_common_regs \\$/;"	d
+slow_copy_page	mmx_32.c	/^static void slow_copy_page(void *to, void *from)$/;"	f	file:
+slow_zero_page	mmx_32.c	/^static void slow_zero_page(void *page)$/;"	f	file:
+strcat	string_32.c	/^EXPORT_SYMBOL(strcat);$/;"	v
+strcat	string_32.c	/^char *strcat(char *dest, const char *src)$/;"	f
+strchr	string_32.c	/^EXPORT_SYMBOL(strchr);$/;"	v
+strchr	string_32.c	/^char *strchr(const char *s, int c)$/;"	f
+strcmp	string_32.c	/^EXPORT_SYMBOL(strcmp);$/;"	v
+strcmp	string_32.c	/^int strcmp(const char *cs, const char *ct)$/;"	f
+strcpy	string_32.c	/^EXPORT_SYMBOL(strcpy);$/;"	v
+strcpy	string_32.c	/^char *strcpy(char *dest, const char *src)$/;"	f
+strlen	string_32.c	/^EXPORT_SYMBOL(strlen);$/;"	v
+strlen	string_32.c	/^size_t strlen(const char *s)$/;"	f
+strncat	string_32.c	/^EXPORT_SYMBOL(strncat);$/;"	v
+strncat	string_32.c	/^char *strncat(char *dest, const char *src, size_t count)$/;"	f
+strncmp	string_32.c	/^EXPORT_SYMBOL(strncmp);$/;"	v
+strncmp	string_32.c	/^int strncmp(const char *cs, const char *ct, size_t count)$/;"	f
+strncpy	string_32.c	/^EXPORT_SYMBOL(strncpy);$/;"	v
+strncpy	string_32.c	/^char *strncpy(char *dest, const char *src, size_t count)$/;"	f
+strnlen	string_32.c	/^EXPORT_SYMBOL(strnlen);$/;"	v
+strnlen	string_32.c	/^size_t strnlen(const char *s, size_t count)$/;"	f
+strstr	strstr_32.c	/^EXPORT_SYMBOL(strstr);$/;"	v
+strstr	strstr_32.c	/^char *strstr(const char *cs, const char *ct)$/;"	f
+use_mwaitx_delay	delay.c	/^void use_mwaitx_delay(void)$/;"	f
+use_tsc_delay	delay.c	/^void use_tsc_delay(void)$/;"	f
+v	atomic64_386_32.S	/^#define v  %esi$/;"	d
+v	atomic64_386_32.S	/^#define v %ecx$/;"	d
+v	atomic64_386_32.S	/^#define v %esi$/;"	d
+validate_next	insn.c	30;"	d	file:
+wbinvd_on_all_cpus	cache-smp.c	/^EXPORT_SYMBOL(wbinvd_on_all_cpus);$/;"	v
+wbinvd_on_all_cpus	cache-smp.c	/^int wbinvd_on_all_cpus(void)$/;"	f
+wbinvd_on_cpu	cache-smp.c	/^EXPORT_SYMBOL(wbinvd_on_cpu);$/;"	v
+wbinvd_on_cpu	cache-smp.c	/^void wbinvd_on_cpu(int cpu)$/;"	f
+write_msr	msr.c	/^EXPORT_TRACEPOINT_SYMBOL(write_msr);$/;"	v
+wrmsr_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(wrmsr_on_cpu);$/;"	v
+wrmsr_on_cpu	msr-smp.c	/^int wrmsr_on_cpu(unsigned int cpu, u32 msr_no, u32 l, u32 h)$/;"	f
+wrmsr_on_cpus	msr-smp.c	/^EXPORT_SYMBOL(wrmsr_on_cpus);$/;"	v
+wrmsr_on_cpus	msr-smp.c	/^void wrmsr_on_cpus(const struct cpumask *mask, u32 msr_no, struct msr *msrs)$/;"	f
+wrmsr_safe_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(wrmsr_safe_on_cpu);$/;"	v
+wrmsr_safe_on_cpu	msr-smp.c	/^int wrmsr_safe_on_cpu(unsigned int cpu, u32 msr_no, u32 l, u32 h)$/;"	f
+wrmsr_safe_regs	msr-reg-export.c	/^EXPORT_SYMBOL(wrmsr_safe_regs);$/;"	v
+wrmsr_safe_regs_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(wrmsr_safe_regs_on_cpu);$/;"	v
+wrmsr_safe_regs_on_cpu	msr-smp.c	/^int wrmsr_safe_regs_on_cpu(unsigned int cpu, u32 *regs)$/;"	f
+wrmsrl_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(wrmsrl_on_cpu);$/;"	v
+wrmsrl_on_cpu	msr-smp.c	/^int wrmsrl_on_cpu(unsigned int cpu, u32 msr_no, u64 q)$/;"	f
+wrmsrl_safe_on_cpu	msr-smp.c	/^EXPORT_SYMBOL(wrmsrl_safe_on_cpu);$/;"	v
+wrmsrl_safe_on_cpu	msr-smp.c	/^int wrmsrl_safe_on_cpu(unsigned int cpu, u32 msr_no, u64 q)$/;"	f
+x86_family	cpu.c	/^EXPORT_SYMBOL_GPL(x86_family);$/;"	v
+x86_family	cpu.c	/^unsigned int x86_family(unsigned int sig)$/;"	f
+x86_model	cpu.c	/^EXPORT_SYMBOL_GPL(x86_model);$/;"	v
+x86_model	cpu.c	/^unsigned int x86_model(unsigned int sig)$/;"	f
+x86_stepping	cpu.c	/^EXPORT_SYMBOL_GPL(x86_stepping);$/;"	v
+x86_stepping	cpu.c	/^unsigned int x86_stepping(unsigned int sig)$/;"	f
