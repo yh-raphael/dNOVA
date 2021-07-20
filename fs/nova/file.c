@@ -728,7 +728,7 @@ static ssize_t do_nova_cow_file_write(struct file *filp,
 			ret = allocated;
 			goto out;
 		}
-
+printk("sizeof(step): %ld \n", sizeof(step));
 		step++;
 		bytes = sb->s_blocksize * allocated - offset;		// [yhc] Subtracting edge block's edge. 
 		if (bytes > count)
