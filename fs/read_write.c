@@ -569,6 +569,28 @@ static inline void file_pos_write(struct file *file, loff_t pos)
 		file->f_pos = pos;
 }
 
+//[yc]
+/*
+ssize_t __vfs_deduplicate_inline(struct file *file, size_t count, loff_t *pos, int from, int to)
+{
+	if (file->f_op->deduplicate_inline)
+		return file->f_op->deduplicate_inline(file, count, pos, from, to);
+	else
+		return -EINVAL;
+}
+*/
+
+ssize_t ksys_deduplicate_inline(unsigned int fd, size_t count, int from, int to)
+{
+	printk("@_@ deduplicate_inline is called \n");
+	return 0;
+}
+
+SYSCALL_DEFINE4(deduplicate_inline, unsigned int, fd, size_t, count, int, from, int, to)
+{
+	return ksys_deduplicate_inline(fd, count, from, to);
+}
+
 ssize_t ksys_read(unsigned int fd, char __user *buf, size_t count)
 {
 	struct fd f = fdget_pos(fd);

@@ -1390,6 +1390,7 @@ static inline unsigned int ksys_personality(unsigned int personality)
 	return old;
 }
 
-asmlinkage long sys_helloworld(void);
+//[yc]
+asmlinkage long sys_deduplicate_inline(unsigned int fd, size_t count, int from, int to);
 
 #endif
