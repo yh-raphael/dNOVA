@@ -23,6 +23,12 @@
 #include "nova.h"
 #include "inode.h"
 
+// DEDUP //
+static int nova_dedup(struct file *filp) {
+	printk("Dedup Function Called \n");
+	return 7;
+}
+// ----- //
 
 static inline int nova_can_set_blocksize_hint(struct inode *inode,
 	struct nova_inode *pi, loff_t new_size)
@@ -166,6 +172,7 @@ static int nova_flush(struct file *file, fl_owner_t id)
 
 static int nova_open(struct inode *inode, struct file *filp)
 {
+	printk("open file success! \n");
 	return generic_file_open(inode, filp);
 }
 
@@ -873,10 +880,14 @@ static ssize_t nova_dax_file_write(struct file *filp, const char __user *buf,
 	struct address_space *mapping = filp->f_mapping;
 	struct inode *inode = mapping->host;
 
-	if (test_opt(inode->i_sb, DATA_COW))
+	if (test_opt(inode->i_sb, DATA_COW)) {
+		printk("--COW--\n");
 		return nova_cow_file_write(filp, buf, len, ppos);
-	else
+	}
+	else {
+		printk("--INPLACE--\n");
 		return nova_inplace_file_write(filp, buf, len, ppos);
+	}
 }
 
 static ssize_t do_nova_dax_file_write(struct file *filp, const char __user *buf,
@@ -924,6 +935,9 @@ static ssize_t nova_dedup_inline(struct file *filp, size_t len)
 
 // [yhc] called by __vfs_read().
 const struct file_operations nova_dax_file_operations = {
+	// DEDUP //
+	.dedup			= nova_dedup,
+	// ----- //
 	.llseek			= nova_llseek,
 	.read			= nova_dax_file_read,
 	.write			= nova_dax_file_write,
@@ -1007,6 +1021,9 @@ err:
 
 /* Wrap read/write_iter for DP, CoW and WP */
 const struct file_operations nova_wrap_file_operations = {
+	// DEDUP //
+	.dedup			= nova_dedup,
+	// ----- //
 	.llseek			= nova_llseek,
 	.read			= nova_dax_file_read,
 	.write			= nova_dax_file_write,
