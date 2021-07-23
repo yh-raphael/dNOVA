@@ -570,26 +570,84 @@ static inline void file_pos_write(struct file *file, loff_t pos)
 }
 
 //[yc]
+
+ssize_t __vfs_dedup_inline(struct file *file, size_t count)
+{
+	printk("!_! __vfs_dedup_inline is called\n");
+//	if (file->f_op->dedup_inline)
+		return file->f_op->dedup_inline(file, count);
+//	else
+//		return -EINVAL;
+}
+
+ssize_t vfs_dedup_inline(struct file *file, size_t count)
+{
+	printk("@_@ vfs_dedup_inline is called\n");	//[debug]
+
+	ssize_t ret;
 /*
-ssize_t __vfs_deduplicate_inline(struct file *file, size_t count, loff_t *pos, int from, int to)
-{
-	if (file->f_op->deduplicate_inline)
-		return file->f_op->deduplicate_inline(file, count, pos, from, to);
-	else
+	if (!(file->f_mode & FMODE_READ))	//[yc] Dedup service needs both read and write.
+		return -EBADF;
+	if (!(file->f_mode & FMODE_CAN_READ))
 		return -EINVAL;
-}
-*/
+	if (!(file->f_mode & FMODE_WRITE))	//
+		return -EBADF;
+	if (!(file->f_mode & FMODE_CAN_WRITE))	//
+		return -EINVAL;
 
-ssize_t ksys_deduplicate_inline(unsigned int fd, size_t count, int from, int to)
-{
-	printk("@_@ deduplicate_inline is called \n");
-	return 0;
+	ret =  rw_verify_area(READ, file, count);
+	if (!ret) {
+		if (count > MAX_RW_COUNT)
+			count = MAX_RW_COUNT;	*/
+//		ret = __vfs_dedup_inline(file, count);
+/*		if (ret > 0) {
+			fsnotify_access(file);		//
+			add_rchar(current, ret);	//
+		}
+		inc_syscr(current);	//
+	}*/
+	if (!(file->f_mode & FMODE_WRITE))
+		return -EBADF;
+	if (!(file->f_mode & FMODE_CAN_WRITE))
+		return -EINVAL;
+//	if (unlikely(!access_ok(buf, count)))
+//		return -EFAULT;
+
+//	ret = rw_verify_area(file, count);
+	if (!ret) {
+		if (count > MAX_RW_COUNT)
+			count =  MAX_RW_COUNT;
+		file_start_write(file);
+		ret = __vfs_dedup_inline(file, count);
+		if (ret > 0) {
+			fsnotify_modify(file);
+			add_wchar(current, ret);
+		}
+		inc_syscw(current);
+		file_end_write(file);
+	}
+	return ret;
 }
 
-SYSCALL_DEFINE4(deduplicate_inline, unsigned int, fd, size_t, count, int, from, int, to)
+ssize_t ksys_dedup_inline(unsigned int fd, size_t count)
 {
-	return ksys_deduplicate_inline(fd, count, from, to);
+	printk("@_@ ksys_dedup_inline is called\n");	//[debug]
+
+	struct fd f = fdget_pos(fd);
+	ssize_t ret = -EBADF;
+printk("-EBADF: %d \n", -EBADF);
+printk("f.file = %d \n", f.file);
+//	if (f.file) {
+		ret = vfs_dedup_inline(f.file, count);
+//	}
+	return ret;
 }
+
+SYSCALL_DEFINE2(dedup_inline, unsigned int, fd, size_t, count)
+{
+	return ksys_dedup_inline(fd, count);
+}
+//[yc]
 
 ssize_t ksys_read(unsigned int fd, char __user *buf, size_t count)
 {

@@ -914,11 +914,21 @@ static int nova_dax_file_mmap(struct file *file, struct vm_area_struct *vma)
 
 	return 0;
 }
+
+//[yc]
+static ssize_t nova_dedup_inline(struct file *filp, size_t len)
+{
+	printk("#_# nova_dedup_inline was called!\n");
+	return 100;
+}
+
 // [yhc] called by __vfs_read().
 const struct file_operations nova_dax_file_operations = {
 	.llseek			= nova_llseek,
 	.read			= nova_dax_file_read,
 	.write			= nova_dax_file_write,
+//[yc]
+	.dedup_inline		= nova_dedup_inline,
 	.read_iter		= nova_dax_read_iter,
 	.write_iter		= nova_dax_write_iter,
 	.mmap			= nova_dax_file_mmap,

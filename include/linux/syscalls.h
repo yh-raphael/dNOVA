@@ -1391,6 +1391,7 @@ static inline unsigned int ksys_personality(unsigned int personality)
 }
 
 //[yc]
-asmlinkage long sys_deduplicate_inline(unsigned int fd, size_t count, int from, int to);
+asmlinkage long sys_dedup_inline(unsigned int fd, size_t count);
+asmlinkage long sys_dedup(void);
 
 #endif
