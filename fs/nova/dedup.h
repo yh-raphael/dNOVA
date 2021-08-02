@@ -7,14 +7,27 @@
 #include <linux/falloc.h>
 #include <asm/mman.h>
 #include <linux/radix-tree.h>
+#include <linux/list.h>
 
 #include "nova.h"
 #include "inode.h"
 
-struct dedup_node {
-	long long dedup_table_entry;
+//struct dedup_node {
+//	long long dedup_table_entry;
+//};
+
+// queue of entries that needs to be deduplicated.
+struct nova_dedup_queue {
+	u64 write_entry_address;
+	struct list_head list;
 };
 
+// leaf node of radix tree containing the address of matching dedup table entry.
+struct nova_dedup_radix_tree_node {
+	loff_t dedup_table_entry;
+};
+
+// used to read from the dedup_table.
 struct dedup_table_entry {
 	char fingerprint[16];
 	loff_t block_address;
@@ -22,6 +35,13 @@ struct dedup_table_entry {
 	int flag;
 };
 
-int dedup_test(struct file*);
+// Debugging function for testing.
+int nova_dedup_test (struct file*);
+
+int nova_dedup_queue_init (void);
+int nova_dedup_queue_push (u64);
+u64 nova_dedup_queue_get_next_entry (void);
+void nova_dedup_init_radix_tree_node (struct nova_dedup_radix_tree_node *, loff_t);
+void nova_fingerprint (char *, char *);
 
 #endif

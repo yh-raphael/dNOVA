@@ -39,10 +39,10 @@ static int nova_dedup(struct file *filp) {
 	sb_start_write(inode->i_sb);	///////
 	inode_lock(inode);		///////
 
-	dedup_test(filp);
+	nova_dedup_test(filp);	// let's test it!
 
-	inode_unlock(inode);
-	sb_end_write(inode->i_sb);
+	inode_unlock(inode);		///////
+	sb_end_write(inode->i_sb);	///////
 
 	return 7;
 }
@@ -689,7 +689,7 @@ unsigned char digest[40];
 		goto out;
 	}
 	pos = *ppos;
-
+printk("starting offset: %lld \n", pos);	//[yc].
 	if (filp->f_flags & O_APPEND)
 		pos = i_size_read(inode);			// [yhc] i_size: file size in bytes.
 
@@ -795,7 +795,10 @@ printk("sizeof(step): %ld \n", sizeof(step));
 		nova_init_file_write_entry(sb, sih, &entry_data, epoch_id,
 					start_blk, allocated, blocknr, time,
 					file_size);				// [yhc] Initializing 'file write entry'.
-
+// DEDUP //
+nova_dedup_queue_init();	//[yc] initialize Dedup-Queue!
+printk("Dedup Queue init\n");
+// DEDUP //
 		ret = nova_append_file_write_entry(sb, pi, inode,
 					&entry_data, &update);			// [yhc] Appending 'file write entry'.
 		if (ret) {
@@ -902,11 +905,11 @@ static ssize_t nova_dax_file_write(struct file *filp, const char __user *buf,
 	struct inode *inode = mapping->host;
 
 	if (test_opt(inode->i_sb, DATA_COW)) {
-		printk("--COW--\n");
+		printk("--COW--\n");		///////[yc].
 		return nova_cow_file_write(filp, buf, len, ppos);
 	}
 	else {
-		printk("--INPLACE--\n");
+		printk("--INPLACE--\n");	///////[yc].
 		return nova_inplace_file_write(filp, buf, len, ppos);
 	}
 }
