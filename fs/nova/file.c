@@ -22,6 +22,7 @@
 #include <asm/mman.h>
 #include "nova.h"
 #include "inode.h"
+#include "dedup.h"
 
 /*** DEDUP ***/
 #include <crypto/hash.h>
@@ -31,6 +32,18 @@
 // DEDUP //
 static int nova_dedup(struct file *filp) {
 	printk("Dedup Function Called \n");
+
+	struct address_space *mapping = filp->f_mapping;		///////
+	struct inode *inode = mapping->host;			///////
+
+	sb_start_write(inode->i_sb);	///////
+	inode_lock(inode);		///////
+
+	dedup_test(filp);
+
+	inode_unlock(inode);
+	sb_end_write(inode->i_sb);
+
 	return 7;
 }
 static int test_hash(const unsigned char *data, unsigned int datalen, unsigned char *digest);
