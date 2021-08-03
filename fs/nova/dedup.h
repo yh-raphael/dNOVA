@@ -12,6 +12,9 @@
 #include "nova.h"
 #include "inode.h"
 
+#define DATABLOCK_SIZE		4096
+#define FINGERPRINT_SIZE	16
+
 //struct dedup_node {
 //	long long dedup_table_entry;
 //};
@@ -38,10 +41,14 @@ struct dedup_table_entry {
 // Debugging function for testing.
 int nova_dedup_test (struct file*);
 
+// Dedup-queue related.
 int nova_dedup_queue_init (void);
 int nova_dedup_queue_push (u64);
 u64 nova_dedup_queue_get_next_entry (void);
+
+// Radix-tree for searching D-table entry related.
 void nova_dedup_init_radix_tree_node (struct nova_dedup_radix_tree_node *, loff_t);
+
 void nova_fingerprint (char *, char *);
 
 #endif

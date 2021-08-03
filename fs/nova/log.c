@@ -908,6 +908,10 @@ int nova_append_file_write_entry(struct super_block *sb, struct nova_inode *pi,
 	entry_info.trans_id = data->trans_id;
 	entry_info.inplace = 0;
 
+// DEDUP //
+//	nova_dedup_queue_push(curr_p);
+// DEDUP //
+
 	ret = nova_append_log_entry(sb, pi, inode, sih, &entry_info);
 	if (ret)
 		nova_err(sb, "%s failed\n", __func__);

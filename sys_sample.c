@@ -6,7 +6,7 @@
 
 int main()
 {
-	FILE* fpp = fopen("a.txt", "r");
+//	FILE* fpp = fopen("a.txt", "r");
 	FILE* fp = fopen("b.txt","rt");
 //	char* buf = (char*)malloc(sizeof(char)*100);
 	printf("%d \n", fileno(fp));
@@ -14,6 +14,6 @@ int main()
 	int ret = syscall(335, temp);
 	printf("sys_dedup () returned %d \n", ret);
 	fclose(fp);
-	fclose(fpp);
+//	fclose(fpp);
 	return 0;
 }
