@@ -31,7 +31,7 @@
 
 // DEDUP //
 static int nova_dedup(struct file *filp) {
-	printk("Dedup Function Called \n");
+	printk("nova_dedup() called in fs/nova/file.c \n");
 
 	struct address_space *mapping = filp->f_mapping;		///////
 	struct inode *inode = mapping->host;			///////
@@ -796,8 +796,8 @@ printk("sizeof(step): %ld \n", sizeof(step));
 					start_blk, allocated, blocknr, time,
 					file_size);				// [yhc] Initializing 'file write entry'.
 // DEDUP //
-nova_dedup_queue_init();	//[yc] initialize Dedup-Queue!
-printk("Dedup Queue init\n");
+//nova_dedup_queue_init();	//[yc] initialize Dedup-Queue!
+//printk("Dedup Queue init\n");
 // DEDUP //
 		ret = nova_append_file_write_entry(sb, pi, inode,
 					&entry_data, &update);			// [yhc] Appending 'file write entry'.
