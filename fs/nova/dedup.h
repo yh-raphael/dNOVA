@@ -12,6 +12,12 @@
 #include "nova.h"
 #include "inode.h"
 
+/*** FingerPrint ***/
+#include <crypto/hash.h>
+#include <crypto/skcipher.h>
+#include <linux/crypto.h>
+
+
 #define DATABLOCK_SIZE		4096
 #define FINGERPRINT_SIZE	16
 
