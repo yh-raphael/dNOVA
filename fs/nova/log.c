@@ -395,7 +395,7 @@ static int nova_update_log_entry(struct super_block *sb, struct inode *inode,
 
 	return 0;
 }
-
+////////////////////////////////////////////////////////////////////////////////////////// DEDUP
 static int nova_append_log_entry(struct super_block *sb,
 	struct nova_inode *pi, struct inode *inode,
 	struct nova_inode_info_header *sih,
@@ -404,6 +404,9 @@ static int nova_append_log_entry(struct super_block *sb,
 	void *entry, *alter_entry;
 	enum nova_entry_type type = entry_info->type;
 	struct nova_inode_update *update = entry_info->update;
+	//////////////// DEDUP //////////////////
+	struct nova_file_write_entry *target_entry = entry_info->data;
+	////////////////////////////////////////
 	u64 tail, alter_tail;
 	u64 curr_p, alter_curr_p;
 	size_t size;
@@ -457,6 +460,14 @@ if (type == FILE_WRITE) {
 	}
 
 	entry_info->curr_p = curr_p;
+	/////////////////// DEDUP /////////////////////
+	// The Write-Entries that are being undergone deduplication should not be here.
+	// Check 'dedup_flag'
+	if (type == FILE_WRITE) {
+		if (target_entry->dedup_flag == 0)
+			nova_dedup_queue_push(curr_p);
+	}
+	///////////////////////////////////////////////
 	return 0;
 }
 

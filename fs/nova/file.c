@@ -32,17 +32,18 @@
 // DEDUP //
 static int nova_dedup(struct file *filp) {
 	printk("nova_dedup() called in fs/nova/file.c \n");
+printk("sizeof(struct file*): %ld \n", sizeof(struct file *));
+printk("sizeof(struct file): %ld \n", sizeof(struct file));
+//	struct address_space *mapping = filp->f_mapping;		///////
+//	struct inode *inode = mapping->host;			///////
 
-	struct address_space *mapping = filp->f_mapping;		///////
-	struct inode *inode = mapping->host;			///////
-
-	sb_start_write(inode->i_sb);	///////
-	inode_lock(inode);		///////
+//	sb_start_write(inode->i_sb);	///////
+//	inode_lock(inode);		///////
 
 	nova_dedup_test(filp);	// let's test it!
 
-	inode_unlock(inode);		///////
-	sb_end_write(inode->i_sb);	///////
+//	inode_unlock(inode);		///////
+//	sb_end_write(inode->i_sb);	///////
 
 	return 7;
 }
@@ -566,8 +567,10 @@ do_dax_mapping_read(struct file *filp, char __user *buf,
 			nr = PAGE_SIZE;
 		}
 
-		nvmm = get_nvmm(sb, sih, entryc, index);		// [yhc] Resolve the adress of target position excluding super_block.
-		dax_mem = nova_get_block(sb, (nvmm << PAGE_SHIFT));	// [yhc] Resolve the adress of target block in PMEM.
+		nvmm = get_nvmm(sb, sih, entryc, index);		// [yhc] Resolve the address of target position excluding super_block.
+printk("nvmm: %x \n", nvmm);
+		dax_mem = nova_get_block(sb, (nvmm << PAGE_SHIFT));	// [yhc] Resolve the address of target block in PMEM.
+printk("dax_mem: %x \n", dax_mem);
 
 memcpy:
 		nr = nr - offset;					// [yhc] Calculates actual amount that should be read.
@@ -694,7 +697,8 @@ printk("starting offset: %lld \n", pos);	//[yc].
 		pos = i_size_read(inode);			// [yhc] i_size: file size in bytes.
 
 	count = len;						// [yhc] 'count' saves the input length info.
-
+printk("count : %ld \n",count);
+printk("pos : %ld \n",pos);
 	pi = nova_get_block(sb, sih->pi_addr);			// [yhc] pi_addr: address in PMEM of an inode.
 
 	/* nova_inode tail pointer will be updated and we make sure all other
@@ -711,6 +715,7 @@ printk("starting offset: %lld \n", pos);	//[yc].
 	total_blocks = num_blocks;						// [yhc] 'total_blocks' saves the necessary number of blocks.
 	start_blk = pos >> sb->s_blocksize_bits;				// [yhc] extracts the index of the starting block.
 //^//
+printk("total_blocks : %ld \n", total_blocks);
 	if (nova_check_overlap_vmas(sb, sih, start_blk, num_blocks)) {
 		nova_dbgv("COW write overlaps with vma: inode %lu, pgoff %lu, %lu blocks\n",
 				inode->i_ino, start_blk, num_blocks);
@@ -739,14 +744,15 @@ printk("starting offset: %lld \n", pos);	//[yc].
 		printk("NOVAAA : helloo\n");	// [yhc] mnt시 dmesg로 확인.
 test_hash("hello dedup nova", 16, digest);
 printk("***Dedup Hash: test_hash() -> %s \n", digest);	// hash testing.
+printk("num_blocks : %ld\n", num_blocks);
 		offset = pos & (nova_inode_blk_size(sih) - 1);
-		start_blk = pos >> sb->s_blocksize_bits;
+		start_blk = pos >> sb->s_blocksize_bits;		//[yc] pos에 위치정보 계속 유지하겟군.
 
 		/* don't zero-out the allocated blocks */
 		allocated = nova_new_data_blocks(sb, sih, &blocknr, start_blk,
 				 num_blocks, ALLOC_NO_INIT, ANY_CPU,
 				 ALLOC_FROM_HEAD);
-
+printk("allocated: %ld\n", allocated);
 		nova_dbg_verbose("%s: alloc %d blocks @ %lu\n", __func__,
 						allocated, blocknr);
 
@@ -762,7 +768,7 @@ printk("sizeof(step): %ld \n", sizeof(step));
 		if (bytes > count)
 			bytes = count;					// [yhc] bytes: eventually saving length info.
 
-		kmem = nova_get_block(inode->i_sb,
+		kmem = nova_get_block(inode->i_sb,			//[yc] kmem: actial address of starting block in PMEM.
 			     nova_get_block_off(sb, blocknr, sih->i_blk_type));	// [yhc] Getting free blocks.
 
 		if (offset || ((offset + bytes) & (PAGE_SIZE - 1)) != 0)  {
@@ -773,12 +779,14 @@ printk("sizeof(step): %ld \n", sizeof(step));
 		}
 		/* Now copy from user buf */
 		//		nova_dbg("Write: %p\n", kmem);
+printk("copied: %ld\n", copied);printk("bytes: %ld\n", bytes);
 		NOVA_START_TIMING(memcpy_w_nvmm_t, memcpy_time);
 		nova_memunlock_range(sb, kmem + offset, bytes, &irq_flags);
 		copied = bytes - memcpy_to_pmem_nocache(kmem + offset,		// [yhc] copied: saves remaining length.
 						buf, bytes);			// [yhc] Actual memory copy occurs here.
 		nova_memlock_range(sb, kmem + offset, bytes, &irq_flags);
 		NOVA_END_TIMING(memcpy_w_nvmm_t, memcpy_time);
+printk("after copied: %ld\n",copied);
 
 		if (data_csum > 0 || data_parity > 0) {
 			ret = nova_protect_file_data(sb, inode, pos, bytes,
@@ -786,10 +794,10 @@ printk("sizeof(step): %ld \n", sizeof(step));
 			if (ret)
 				goto out;
 		}
-
-		if (pos + copied > inode->i_size)
+										//[yc] i_size : file size in bytes.
+		if (pos + copied > inode->i_size)				//[yc] just overwriting case.
 			file_size = cpu_to_le64(pos + copied);
-		else
+		else								//[yc] just overwriting case.
 			file_size = cpu_to_le64(inode->i_size);
 
 		nova_init_file_write_entry(sb, sih, &entry_data, epoch_id,
@@ -1051,6 +1059,8 @@ const struct file_operations nova_wrap_file_operations = {
 	.llseek			= nova_llseek,
 	.read			= nova_dax_file_read,
 	.write			= nova_dax_file_write,
+//[yc]
+	.dedup_inline		= nova_dedup_inline,
 	.read_iter		= nova_wrap_rw_iter,
 	.write_iter		= nova_wrap_rw_iter,
 	.mmap			= nova_dax_file_mmap,

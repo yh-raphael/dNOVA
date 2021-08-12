@@ -242,7 +242,7 @@ int nova_cleanup_incomplete_write(struct super_block *sb,
 
 	return 0;
 }
-
+//////////////////////[yc] dedup flag added ////////////////////////////
 void nova_init_file_write_entry(struct super_block *sb,
 	struct nova_inode_info_header *sih, struct nova_file_write_entry *entry,
 	u64 epoch_id, u64 pgoff, int num_pages, u64 blocknr, u32 time,
@@ -721,6 +721,10 @@ ssize_t do_nova_inplace_file_write(struct file *filp,
 			nova_init_file_write_entry(sb, sih, &entry_data,
 						epoch_id, start_blk, allocated,
 						blocknr, time, file_size);
+
+			/////////// DEDUP //////////////////
+			entry_data.dedup_flag = 2;		/////////// what does this mean???
+			////////////////////////////////////
 
 			ret = nova_append_file_write_entry(sb, pi, inode,
 						&entry_data, &update);

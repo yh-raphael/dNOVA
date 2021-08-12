@@ -24,13 +24,15 @@ CPUID_MASK	bbuild.c	279;"	d	file:
 CSUM0	parity.c	146;"	d	file:
 Countstats	stats.c	/^u64 Countstats[TIMING_NUM];$/;"	v
 DATA	balloc.h	/^	DATA,$/;"	e	enum:alloc_type
+DATABLOCK_SIZE	dedup.h	25;"	d
 DEAD_ZONE_BLOCKS	nova.h	141;"	d
-DENTRY	log.h	113;"	d
+DENTRY	log.h	114;"	d
 DIR_LOG	log.h	/^	DIR_LOG,$/;"	e	enum:nova_entry_type
 DT2IF	dir.c	23;"	d	file:
 ENTRY_LOC	log.h	16;"	d
 EXTEND_THRESHOLD	log.h	38;"	d
 FILE_WRITE	log.h	/^	FILE_WRITE = 1,$/;"	e	enum:nova_entry_type
+FINGERPRINT_SIZE	dedup.h	26;"	d
 FREE_BATCH	nova.h	140;"	d
 HEAD_RESERVED_BLOCKS	super.h	57;"	d
 IF2DT	dir.c	24;"	d	file:
@@ -44,7 +46,7 @@ IS_MAP_WRITE	nova.h	157;"	d
 JOURNAL_ENTRY	journal.h	15;"	d
 JOURNAL_INODE	journal.h	14;"	d
 JOURNAL_START	super.h	64;"	d
-LCENTRY	log.h	163;"	d
+LCENTRY	log.h	164;"	d
 LINK_CHANGE	log.h	/^	LINK_CHANGE,$/;"	e	enum:nova_entry_type
 LOG	balloc.h	/^	LOG = 1,$/;"	e	enum:alloc_type
 LOG_BLOCK_TAIL	log.h	18;"	d
@@ -55,7 +57,7 @@ META_BLK_SHIFT	nova_def.h	67;"	d
 MMAP_ADDR	nova.h	158;"	d
 MMAP_WRITE	log.h	/^	MMAP_WRITE,$/;"	e	enum:nova_entry_type
 MMAP_WRITE_BIT	nova.h	156;"	d
-MMENTRY	log.h	180;"	d
+MMENTRY	log.h	181;"	d
 NEXT_PAGE	log.h	/^	NEXT_PAGE,$/;"	e	enum:nova_entry_type
 NODE_BLOCK	balloc.h	/^	NODE_BLOCK = 1,$/;"	e	enum:node_type
 NODE_DIR	balloc.h	/^	NODE_DIR,$/;"	e	enum:node_type
@@ -76,10 +78,10 @@ NOVA_DBGMASK_TRANSACTION	nova.h	79;"	d
 NOVA_DBGMASK_VERBOSE	nova.h	78;"	d
 NOVA_DEFAULT_BLOCK_TYPE	nova_def.h	74;"	d
 NOVA_DEF_BLOCK_SIZE_4K	nova_def.h	52;"	d
-NOVA_DENTRY_HEADER_LEN	log.h	117;"	d
-NOVA_DIR_LOG_REC_LEN	log.h	118;"	d
-NOVA_DIR_PAD	log.h	115;"	d
-NOVA_DIR_ROUND	log.h	116;"	d
+NOVA_DENTRY_HEADER_LEN	log.h	118;"	d
+NOVA_DIR_LOG_REC_LEN	log.h	119;"	d
+NOVA_DIR_PAD	log.h	116;"	d
+NOVA_DIR_ROUND	log.h	117;"	d
 NOVA_END_TIMING	stats.h	211;"	d
 NOVA_EOFBLOCKS_FL	nova.h	116;"	d
 NOVA_FL_INHERITED	nova.h	118;"	d
@@ -95,7 +97,7 @@ NOVA_LARGE_INODE_TABLE_SIZE	nova.h	108;"	d
 NOVA_LARGE_INODE_TABLE_THREASHOLD	nova.h	110;"	d
 NOVA_LINK_MAX	nova_def.h	50;"	d
 NOVA_LITEJOURNAL_INO	super.h	80;"	d
-NOVA_MAX_ENTRY_LEN	log.h	122;"	d
+NOVA_MAX_ENTRY_LEN	log.h	123;"	d
 NOVA_MAX_JOURNAL_LENGTH	journal.h	12;"	d
 NOVA_META_CSUM_LEN	nova_def.h	133;"	d
 NOVA_MOUNT_DATA_COW	nova_def.h	45;"	d
@@ -162,10 +164,10 @@ POISON_RADIUS	nova_def.h	150;"	d
 RANGENODE_PER_PAGE	nova.h	398;"	d
 READDIR_END	nova.h	137;"	d
 RESERVE_INODE_START	super.h	61;"	d
-SENTRY	log.h	144;"	d
+SENTRY	log.h	145;"	d
 SET_ATTR	log.h	/^	SET_ATTR,$/;"	e	enum:nova_entry_type
 SNAPSHOT_INFO	log.h	/^	SNAPSHOT_INFO,$/;"	e	enum:nova_entry_type
-SNENTRY	log.h	197;"	d
+SNENTRY	log.h	198;"	d
 SS_FILE_WRITE	snapshot.h	/^	SS_FILE_WRITE,$/;"	e	enum:nova_snapshot_entry_type
 SS_INODE	snapshot.h	/^	SS_INODE = 1,$/;"	e	enum:nova_snapshot_entry_type
 STATS_NUM	stats.h	/^	STATS_NUM,$/;"	e	enum:stats_category
@@ -178,9 +180,10 @@ TYPE_MKNOD	inode.h	/^	TYPE_MKNOD,$/;"	e	enum:nova_new_inode_type
 TYPE_SYMLINK	inode.h	/^	TYPE_SYMLINK,$/;"	e	enum:nova_new_inode_type
 Timingstats	stats.c	/^u64 Timingstats[TIMING_NUM];$/;"	v
 Timingstring	stats.c	/^const char *Timingstring[TIMING_NUM] = {$/;"	v
-WENTRY	log.h	90;"	d
+WENTRY	log.h	91;"	d
 _LINUX_NOVA_DEF_H	nova_def.h	21;"	d
 __BALLOC_H	balloc.h	2;"	d
+__DEDUP_H__	dedup.h	2;"	d
 __INODE_H	inode.h	2;"	d
 __JOURNAL_H	journal.h	2;"	d
 __LOG_H	log.h	2;"	d
@@ -237,6 +240,7 @@ bitmap_size	nova.h	/^	unsigned long bitmap_size;$/;"	m	struct:single_scan_bm
 blk_type_to_shift	inode.c	/^unsigned int blk_type_to_shift[NOVA_BLOCK_TYPE_MAX] = {12, 21, 30};$/;"	v
 blk_type_to_size	inode.c	/^uint32_t blk_type_to_size[NOVA_BLOCK_TYPE_MAX] = {0x1000, 0x200000, 0x40000000};$/;"	v
 block	log.h	/^	__le64	block;          \/* offset of first block in this write *\/$/;"	m	struct:nova_file_write_entry
+block_address	dedup.h	/^	loff_t block_address;$/;"	m	struct:dedup_table_entry
 block_csum_parity	stats.h	/^	block_csum_parity,$/;"	e	enum:stats_category
 block_csum_parity_t	stats.h	/^	block_csum_parity_t,$/;"	e	enum:timing_category
 block_csum_t	stats.h	/^	block_csum_t,$/;"	e	enum:timing_category
@@ -248,6 +252,8 @@ blocksize	super.h	/^	unsigned long	blocksize;$/;"	m	struct:nova_sb_info
 bm_type	nova.h	/^enum bm_type {$/;"	g
 bpi	super.h	/^	unsigned long	bpi;$/;"	m	struct:nova_sb_info
 calc_entry_csum_t	stats.h	/^	calc_entry_csum_t,$/;"	e	enum:timing_category
+calc_hash	dedup.c	/^static int calc_hash(struct crypto_shash *alg,$/;"	f	file:
+calc_hash	file.c	/^static int calc_hash(struct crypto_shash *alg,$/;"	f	file:
 call	perf.h	/^	int (*call)(char *, char *, size_t, size_t); \/* dst, src, off, size *\/$/;"	m	struct:__anon5
 call	perf.h	/^	u64 (*call)(char **, char *,                        \/* data, parity *\/$/;"	m	struct:__anon7
 call	perf.h	/^	u64 (*call)(u64, char *, size_t);               \/* init, data, size *\/$/;"	m	struct:__anon6
@@ -288,6 +294,8 @@ csumpadding	log.h	/^	__le32	csumpadding;$/;"	m	struct:nova_mmap_entry
 csumpadding	log.h	/^	__le32	csumpadding;$/;"	m	struct:nova_snapshot_info_entry
 ctime	log.h	/^	__le32	ctime;$/;"	m	struct:nova_link_change_entry
 ctime	log.h	/^	__le32	ctime;$/;"	m	struct:nova_setattr_logentry
+ctx	dedup.c	/^    char ctx[];$/;"	m	struct:sdesc	file:
+ctx	file.c	/^    char ctx[];$/;"	m	struct:sdesc	file:
 curr_clean_snapshot_info	super.h	/^	void *curr_clean_snapshot_info;$/;"	m	struct:nova_sb_info
 curr_entry	log.h	/^	u64 curr_entry;$/;"	m	struct:nova_inode_update
 curr_log_entry_invalid	gc.c	/^static bool curr_log_entry_invalid(struct super_block *sb,$/;"	f	file:
@@ -303,6 +311,12 @@ dax_get_block_t	stats.h	/^	dax_get_block_t,$/;"	e	enum:timing_category
 dax_new_blocks	stats.h	/^	dax_new_blocks,$/;"	e	enum:stats_category
 dax_read_t	stats.h	/^	dax_read_t,$/;"	e	enum:timing_category
 de_len	log.h	/^	__le16	de_len;			\/* length of this dentry *\/$/;"	m	struct:nova_dentry
+dedup_flag	log.h	/^	u8	dedup_flag;	\/\/ DEDUP \/\/$/;"	m	struct:nova_file_write_entry
+dedup_table_entry	dedup.h	/^	loff_t dedup_table_entry;$/;"	m	struct:nova_dedup_radix_tree_node
+dedup_table_entry	dedup.h	/^struct dedup_table_entry {$/;"	s
+dedup_table_update	dedup.c	/^ssize_t dedup_table_update (struct file *file, const void *buf, size_t count, loff_t *pos)$/;"	f
+dedup_tree_address	super.h	/^	struct radix_tree_root dedup_tree_address;$/;"	m	struct:nova_sb_info	typeref:struct:nova_sb_info::radix_tree_root
+dedup_tree_fingerprint	super.h	/^	struct radix_tree_root dedup_tree_fingerprint;$/;"	m	struct:nova_sb_info	typeref:struct:nova_sb_info::radix_tree_root
 delete_dentry	log.h	/^	struct nova_dentry *delete_dentry;$/;"	m	struct:nova_inode_update	typeref:struct:nova_inode_update::nova_dentry
 delete_dir_tree_t	stats.h	/^	delete_dir_tree_t,$/;"	e	enum:timing_category
 delete_epoch_id	inode.h	/^	__le64	delete_epoch_id; \/* Transaction ID when deleted *\/$/;"	m	struct:nova_inode
@@ -352,10 +366,12 @@ fast_gc_t	stats.h	/^	fast_gc_t,$/;"	e	enum:timing_category
 fdatasync	stats.h	/^	fdatasync,$/;"	e	enum:stats_category
 file_size	log.h	/^	u64 file_size;	\/* de_len for dentry *\/$/;"	m	struct:nova_log_entry_info
 find_cache_t	stats.h	/^	find_cache_t,$/;"	e	enum:timing_category
+fingerprint	dedup.h	/^	char fingerprint[16];$/;"	m	struct:dedup_table_entry
 finish_wq	bbuild.c	/^wait_queue_head_t finish_wq;$/;"	v
 finished	bbuild.c	/^int *finished;$/;"	v
 first_inode_range	nova.h	/^	struct nova_range_node *first_inode_range;$/;"	m	struct:inode_map	typeref:struct:inode_map::nova_range_node
 first_node	balloc.h	/^	struct nova_range_node *first_node; \/\/ lowest address free range$/;"	m	struct:free_list	typeref:struct:free_list::nova_range_node
+flag	dedup.h	/^	int flag;$/;"	m	struct:dedup_table_entry
 flags	log.h	/^	__le32	flags;$/;"	m	struct:nova_link_change_entry
 flush_buffer_id	perf.h	/^	flush_buffer_id,$/;"	e	enum:to_pmem_call_id
 free_blocks_t	stats.h	/^	free_blocks_t,$/;"	e	enum:timing_category
@@ -428,6 +444,8 @@ init_inodecache	super.c	/^static int __init init_inodecache(void)$/;"	f	file:
 init_nova_fs	super.c	/^static int __init init_nova_fs(void)$/;"	f	file:
 init_once	super.c	/^static void init_once(void *foo)$/;"	f	file:
 init_rangenode_cache	super.c	/^static int __init init_rangenode_cache(void)$/;"	f	file:
+init_sdesc	dedup.c	/^static struct sdesc *init_sdesc(struct crypto_shash *alg)$/;"	f	file:
+init_sdesc	file.c	/^static struct sdesc *init_sdesc(struct crypto_shash *alg)$/;"	f	file:
 init_snapshot_info_cache	super.c	/^static int __init init_snapshot_info_cache(void)$/;"	f	file:
 init_snapshot_info_t	stats.h	/^	init_snapshot_info_t,$/;"	e	enum:timing_category
 init_t	stats.h	/^	init_t,$/;"	e	enum:timing_category
@@ -474,6 +492,7 @@ link_t	stats.h	/^	link_t,$/;"	e	enum:timing_category
 link_trans_t	stats.h	/^	link_trans_t,$/;"	e	enum:timing_category
 links	log.h	/^	__le16	links;$/;"	m	struct:nova_link_change_entry
 links_count	log.h	/^	__le16	links_count;$/;"	m	struct:nova_dentry
+list	dedup.h	/^	struct list_head list;$/;"	m	struct:nova_dedup_queue	typeref:struct:nova_dedup_queue::list_head
 list	inode.h	/^	struct list_head list;		\/* SB list of mmap sih *\/$/;"	m	struct:nova_inode_info_header	typeref:struct:nova_inode_info_header::list_head
 list_mutex	snapshot.h	/^	struct mutex list_mutex;$/;"	m	struct:snapshot_list	typeref:struct:snapshot_list::mutex
 lists	snapshot.h	/^	struct snapshot_list *lists;	\/* Per-CPU snapshot list *\/$/;"	m	struct:snapshot_info	typeref:struct:snapshot_info::snapshot_list
@@ -678,6 +697,17 @@ nova_dbg_trans	nova.h	91;"	d
 nova_dbg_verbose	nova.h	88;"	d
 nova_dbgmask	super.c	/^unsigned int nova_dbgmask;$/;"	v
 nova_dbgv	nova.h	90;"	d
+nova_dedup	file.c	/^static int nova_dedup(struct file *filp) {$/;"	f	file:
+nova_dedup_fingerprint	dedup.c	/^int nova_dedup_fingerprint(char *datapage, char *ret_fingerprint)$/;"	f
+nova_dedup_init_radix_tree_node	dedup.c	/^void nova_dedup_init_radix_tree_node(struct nova_dedup_radix_tree_node * node, loff_t entry_address)$/;"	f
+nova_dedup_inline	file.c	/^static ssize_t nova_dedup_inline(struct file *filp, size_t len)$/;"	f	file:
+nova_dedup_queue	dedup.h	/^struct nova_dedup_queue {$/;"	s
+nova_dedup_queue_get_next_entry	dedup.c	/^u64 nova_dedup_queue_get_next_entry(void)$/;"	f
+nova_dedup_queue_head	dedup.c	/^struct nova_dedup_queue nova_dedup_queue_head;$/;"	v	typeref:struct:nova_dedup_queue
+nova_dedup_queue_init	dedup.c	/^int nova_dedup_queue_init(void)$/;"	f
+nova_dedup_queue_push	dedup.c	/^int nova_dedup_queue_push(u64 new_address)$/;"	f
+nova_dedup_radix_tree_node	dedup.h	/^struct nova_dedup_radix_tree_node {$/;"	s
+nova_dedup_test	dedup.c	/^int nova_dedup_test(struct file *filp)$/;"	f
 nova_delete_dead_inode	inode.c	/^int nova_delete_dead_inode(struct super_block *sb, u64 ino)$/;"	f
 nova_delete_dir_tree	dir.c	/^void nova_delete_dir_tree(struct super_block *sb,$/;"	f
 nova_delete_file_tree	inode.c	/^int nova_delete_file_tree(struct super_block *sb,$/;"	f
@@ -716,7 +746,7 @@ nova_fallocate	file.c	/^static long nova_fallocate(struct file *file, int mode, 
 nova_fh_to_dentry	super.c	/^static struct dentry *nova_fh_to_dentry(struct super_block *sb,$/;"	f	file:
 nova_fh_to_parent	super.c	/^static struct dentry *nova_fh_to_parent(struct super_block *sb,$/;"	f	file:
 nova_file_inode_operations	file.c	/^const struct inode_operations nova_file_inode_operations = {$/;"	v	typeref:struct:inode_operations
-nova_file_write_entry	log.h	/^struct nova_file_write_entry {$/;"	s
+nova_file_write_entry	log.h	/^struct nova_file_write_entry {	\/\/ [yhc] Log entry size: 64Bytes.$/;"	s
 nova_fill_super	super.c	/^static int nova_fill_super(struct super_block *sb, void *data, int silent)$/;"	f	file:
 nova_find_dentry	dir.c	/^struct nova_dentry *nova_find_dentry(struct super_block *sb,$/;"	f
 nova_find_free_slot	balloc.c	/^int nova_find_free_slot(struct rb_root *tree, unsigned long range_low,$/;"	f
@@ -1150,7 +1180,6 @@ padding	balloc.h	/^	u64		padding[8];	\/* Cache line break *\/$/;"	m	struct:free_
 padding	journal.h	/^	__le32 padding;$/;"	m	struct:nova_lite_journal_entry
 padding	log.h	/^	__le64	padding;$/;"	m	struct:nova_dentry
 padding	log.h	/^	char padding[LOG_BLOCK_TAIL];$/;"	m	struct:nova_inode_log_page
-padding	log.h	/^	u8	padding;$/;"	m	struct:nova_file_write_entry
 padding	snapshot.h	/^	__le64 padding;$/;"	m	struct:snapshot_nvmm_list
 padding	snapshot.h	/^	u8	padding[6];$/;"	m	struct:snapshot_file_write_entry
 padding	snapshot.h	/^	u8	padding[6];$/;"	m	struct:snapshot_inode_entry
@@ -1201,6 +1230,7 @@ rebuild_file_t	stats.h	/^	rebuild_file_t,$/;"	e	enum:timing_category
 rebuild_snapshot_t	stats.h	/^	rebuild_snapshot_t,$/;"	e	enum:timing_category
 rebuild_title_t	stats.h	/^	rebuild_title_t,$/;"	e	enum:timing_category
 recovery_t	stats.h	/^	recovery_t,$/;"	e	enum:timing_category
+reference_count	dedup.h	/^	int reference_count;$/;"	m	struct:dedup_table_entry
 remove_dentry_t	stats.h	/^	remove_dentry_t,$/;"	e	enum:timing_category
 remove_vma_t	stats.h	/^	remove_vma_t,$/;"	e	enum:timing_category
 rename_t	stats.h	/^	rename_t,$/;"	e	enum:timing_category
@@ -1239,6 +1269,8 @@ scan_bitmap	nova.h	/^struct scan_bitmap {$/;"	s
 scan_bm_1G	nova.h	/^	struct single_scan_bm scan_bm_1G;$/;"	m	struct:scan_bitmap	typeref:struct:scan_bitmap::single_scan_bm
 scan_bm_2M	nova.h	/^	struct single_scan_bm scan_bm_2M;$/;"	m	struct:scan_bitmap	typeref:struct:scan_bitmap::single_scan_bm
 scan_bm_4K	nova.h	/^	struct single_scan_bm scan_bm_4K;$/;"	m	struct:scan_bitmap	typeref:struct:scan_bitmap::single_scan_bm
+sdesc	dedup.c	/^struct sdesc {$/;"	s	file:
+sdesc	file.c	/^struct sdesc {$/;"	s	file:
 set_bm	bbuild.c	/^inline void set_bm(unsigned long bit, struct scan_bitmap *bm,$/;"	f
 set_default_opts	super.c	/^static inline void set_default_opts(struct nova_sb_info *sbi)$/;"	f	file:
 set_opt	nova.h	105;"	d
@@ -1246,6 +1278,8 @@ set_scan_bm	bbuild.c	/^static inline void set_scan_bm(unsigned long bit,$/;"	f	f
 set_vma_read_t	stats.h	/^	set_vma_read_t,$/;"	e	enum:timing_category
 setattr_t	stats.h	/^	setattr_t,$/;"	e	enum:timing_category
 setsize_t	stats.h	/^	setsize_t,$/;"	e	enum:timing_category
+shash	dedup.c	/^    struct shash_desc shash;$/;"	m	struct:sdesc	typeref:struct:sdesc::shash_desc	file:
+shash	file.c	/^    struct shash_desc shash;$/;"	m	struct:sdesc	typeref:struct:sdesc::shash_desc	file:
 single_scan_bm	nova.h	/^struct single_scan_bm {$/;"	s
 size	log.h	/^	__le64	size;           \/* File size after this write *\/$/;"	m	struct:nova_file_write_entry
 size	log.h	/^	__le64	size;        \/* File size after truncation *\/$/;"	m	struct:nova_setattr_logentry
@@ -1273,6 +1307,8 @@ tail	snapshot.h	/^	unsigned long tail;$/;"	m	struct:snapshot_list
 tail_reserved_blocks	super.h	/^	unsigned long	tail_reserved_blocks;$/;"	m	struct:nova_sb_info
 task_ring	bbuild.c	/^struct task_ring {$/;"	s	file:
 task_rings	bbuild.c	/^static struct task_ring *task_rings;$/;"	v	typeref:struct:task_ring	file:
+temp_rb_node	dedup.c	/^struct rb_node temp_rb_node;$/;"	v	typeref:struct:rb_node
+test_hash	file.c	/^static int test_hash(const unsigned char *data, unsigned int datalen,$/;"	f	file:
 test_opt	nova.h	106;"	d
 thorough_checked_pages	stats.h	/^	thorough_checked_pages,$/;"	e	enum:stats_category
 thorough_gc_pages	stats.h	/^	thorough_gc_pages,$/;"	e	enum:stats_category
@@ -1332,6 +1368,7 @@ wprotect_disable	mprotect.h	/^static inline void wprotect_disable(void)$/;"	f
 wprotect_enable	mprotect.h	/^static inline void wprotect_enable(void)$/;"	f
 wprotect_t	stats.h	/^	wprotect_t,$/;"	e	enum:timing_category
 wrap_iter_t	stats.h	/^	wrap_iter_t,$/;"	e	enum:timing_category
+write_entry_address	dedup.h	/^	u64 write_entry_address;$/;"	m	struct:nova_dedup_queue
 write_iter_t	stats.h	/^	write_iter_t,$/;"	e	enum:timing_category
 write_pages_t	stats.h	/^	write_pages_t,$/;"	e	enum:timing_category
 zero_csum	super.h	/^	u32 zero_csum[8];$/;"	m	struct:nova_sb_info

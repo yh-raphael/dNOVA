@@ -7,13 +7,15 @@
 int main()
 {
 //	FILE* fpp = fopen("a.txt", "r");
-	FILE* fp = fopen("b.txt","rt");
+//	FILE* fp = fopen("b.txt","rt");
 //	char* buf = (char*)malloc(sizeof(char)*100);
-	printf("%d \n", fileno(fp));
-	unsigned int temp = fileno(fp);
-	int ret = syscall(335, temp);
+//	printf("fileno: %d \n", fileno(fp));
+//	unsigned int temp = fileno(fp);
+//	int ret = syscall(335, temp);
+	printf("executing user program!\n");
+	int ret = syscall(335);
 	printf("sys_dedup () returned %d \n", ret);
-	fclose(fp);
+//	fclose(fp);
 //	fclose(fpp);
 	return 0;
 }

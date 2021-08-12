@@ -5,9 +5,13 @@
 #include <linux/uio.h>
 #include <linux/uaccess.h>
 #include <linux/falloc.h>
+#include <linux/sched/xacct.h>
 #include <asm/mman.h>
+#include <asm/uaccess.h>
 #include <linux/radix-tree.h>
 #include <linux/list.h>
+#include <linux/fs.h>
+#include <linux/fsnotify.h>
 
 #include "nova.h"
 #include "inode.h"
@@ -19,7 +23,7 @@
 
 
 #define DATABLOCK_SIZE		4096
-#define FINGERPRINT_SIZE	16
+#define FINGERPRINT_SIZE	20
 
 //struct dedup_node {
 //	long long dedup_table_entry;

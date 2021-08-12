@@ -128,6 +128,43 @@ int nova_dedup_fingerprint(char *datapage, char *ret_fingerprint)
     return ret;
 }
 
+
+// Append a new Dedup-Table entry.
+ssize_t dedup_table_update (struct file *file, const void *buf, size_t count, loff_t *pos)
+{
+	mm_segment_t old_fs;
+	ssize_t ret = -EINVAL;
+
+	old_fs = get_fs();
+	set_fs(KERNEL_DS);
+
+	if (!(file->f_mode & FMODE_WRITE))
+		return -EBADF;
+	if (!(file->f_mode & FMODE_CAN_WRITE))
+		return -EINVAL;
+	if (unlikely(!access_ok(buf, count)))
+		return -EFAULT;
+
+	if (count > MAX_RW_COUNT)
+		count = MAX_RW_COUNT;
+	file_start_write(file);
+
+	if (file->f_op->write)
+		ret = nova_inplace_file_write(file, buf, count, pos);
+
+	if (ret > 0) {
+		fsnotify_modify(file);
+		add_wchar(current, ret);
+	}
+	inc_syscw(current);	/////////////////////////// ???
+	file_end_write(file);
+
+	set_fs(old_fs);
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
 int nova_dedup_test(struct file *filp)
 {
 	// for Radix-tree
@@ -145,10 +182,10 @@ int nova_dedup_test(struct file *filp)
 	// for write-entry
 	struct nova_file_write_entry *target_entry;
 	u64 entry_address;
-	char *buf;
-	char *fingerprint;
+	char *buf;		// buffer space.
+	char *fingerprint;	// fp space.
 	unsigned long left;
-	pgoff_t index;
+	pgoff_t index;		// page offset.
 	int i, j, data_page_number = 0;
 	unsigned long nvmm;
 	void *dax_mem = NULL;
@@ -156,8 +193,8 @@ int nova_dedup_test(struct file *filp)
 	printk("fs/nova/dedup.c\n");
 
 printk("Initialize buffer, and fingerprint\n");
-	buf = kmalloc(DATABLOCK_SIZE, GFP_KERNEL);
-	fingerprint = kmalloc(FINGERPRINT_SIZE, GFP_KERNEL);
+	buf = kmalloc(DATABLOCK_SIZE, GFP_KERNEL);	// 4KB-size buffer allocated.
+	fingerprint = kmalloc(FINGERPRINT_SIZE, GFP_KERNEL);	// 20B-size fp space allocated.
 
 	// Pop write Entry.
 	entry_address = nova_dedup_queue_get_next_entry();
@@ -172,28 +209,32 @@ printk("Initialize buffer, and fingerprint\n");
 		index = target_entry->pgoff;
 		data_page_number = target_entry->num_pages;
 
+		// iterate as much as # of data pages.
 		for (i = 0; i < data_page_number; i++) {
 	printk("Data Page number %d ! \n", i + 1);
+			// READ path like.
 			nvmm = (unsigned long) (target_entry->block >> PAGE_SHIFT) + index - target_entry->pgoff;
 			dax_mem = nova_get_block (sb, (nvmm << PAGE_SHIFT));
 			memset(buf, 0, DATABLOCK_SIZE);
 			memset(fingerprint, 0, FINGERPRINT_SIZE);
 			left = __copy_to_user(buf, dax_mem, DATABLOCK_SIZE);	// PMEM to DRAM.
+
 			if (left) {
 				nova_dbg("%s ERROR!: left %lu\n", __func__, left);
 				return 0;
 			}
 
+	printk("Fingerprint Start \n");
 			// Make Fingerprint
 			nova_dedup_fingerprint(buf, fingerprint);
-
+	printk("Fingerprint End \n");
 			// Print Fp.
-			for (i = 0; i < FINGERPRINT_SIZE; i++)
+			for (i = 0; i < FINGERPRINT_SIZE; i++) {
 				printk("%08x", fingerprint[i]);
+			}
 			printk("\n");
 
 	//		printk("%c %c %c\n", buf[0], buf[1], buf[2]);
-
 			index++;
 		}
 	}
@@ -223,7 +264,7 @@ printk("Initialize buffer, and fingerprint\n");
 //		printk("dedup_table_entry: %lld \n", temp3->dedup_table_entry);
 //	}
 
-	kfree(buf);
-//kfree(fingerprint);
+	kfree(buf);		// memory free for buffer space.
+	kfree(fingerprint);	// memory free for fp space.
 	return 0;
 }
