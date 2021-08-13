@@ -1,8 +1,7 @@
 #include "dedup.h"
 #include <linux/rbtree.h>
 
-struct rb_node temp_rb_node;
-
+// struct rb_node temp_rb_node;
 struct nova_dedup_queue nova_dedup_queue_head;
 
 // Initialize Dedup-Queue
@@ -14,18 +13,19 @@ int nova_dedup_queue_init(void)
 }
 
 // Insert Write-entries to Dedup-Queue.
-int nova_dedup_queue_push(u64 new_address)
+int nova_dedup_queue_push(u64 new_address, u64 target_inode_number)
 {
 	struct nova_dedup_queue *new_data;
 	new_data = kmalloc(sizeof(struct nova_dedup_queue), GFP_KERNEL);
 	list_add_tail(&new_data->list, &nova_dedup_queue_head.list);		// add to the list.
 	new_data->write_entry_address = new_address;				// save the contents.
-	printk("PUSH a write entry to queue: %llu\n", new_address);
+	new_data->target_inode_number = target_inode_number;
+	printk("PUSH a write entry to the D-Queue: %llu, %llu\n", new_address, target_inode_number);
 	return 0;
 }
 
 // Get next write entry to dedup.
-u64 nova_dedup_queue_get_next_entry(void)
+u64 nova_dedup_queue_get_next_entry(u64 *target_inode_number)
 {
 	struct nova_dedup_queue *ptr;
 
@@ -33,26 +33,24 @@ u64 nova_dedup_queue_get_next_entry(void)
 	u64 ret = 0;
 	if (!list_empty(&nova_dedup_queue_head.list)) {
 		ptr = list_entry(nova_dedup_queue_head.list.next, struct nova_dedup_queue, list);	// ??! what means the "list"? -> a member
-//		printk("checking~ %llu \n", ptr->write_entry_address);
-//		return 1;
-//	}
-//	else {
-//		return 0;
-		printk("sizeof(struct list_head): %lu, sizeof(struct nova_dedup_queue): %lu\n", sizeof(struct list_head), sizeof(struct nova_dedup_queue));
+	printk("sizeof(struct list_head): %lu, sizeof(struct nova_dedup_queue): %lu\n", sizeof(struct list_head), sizeof(struct nova_dedup_queue));
+		// assign values: call-by-value & call-by-reference
 		ret = ptr->write_entry_address;
+		*target_inode_number = ptr->target_inode_number;
+		// delete from the list.
 		list_del(nova_dedup_queue_head.list.next);	// dequeue the first element, [DEBUG] The problem>??
 		kfree(ptr);	//
-		printk("POP from queue: %llu \n", ret);
+	printk("POP from queue: %llu, %llu \n", ret, *target_inode_number);
 	}
 	return ret;
 }
 
 // Initialize a Radix-tree leaf node.
-void nova_dedup_init_radix_tree_node(struct nova_dedup_radix_tree_node * node, loff_t entry_address)
-{
-	memset(node, 0, sizeof(struct nova_dedup_radix_tree_node));
-	node->dedup_table_entry = entry_address;
-}
+//void nova_dedup_init_radix_tree_node(struct nova_dedup_radix_tree_node * node, loff_t entry_address)
+//{
+//	memset(node, 0, sizeof(struct nova_dedup_radix_tree_node));
+//	node->dedup_table_entry = entry_address;
+//}
 
 //void nova_init_dedup_entry(struct dedup_node *entry) {
 //	memset(entry, 0, sizeof(struct dedup_node));
@@ -66,42 +64,37 @@ But Linux itself provides a Crypto API for various encryption calculations of da
 Using this API, you can perform some encryption and signature operations in the kernel module.
 The following is an example of SHA-1.
 */
-// DEDUP //
-struct sdesc {
-    struct shash_desc shash;
-    char ctx[];
-};
 
 static struct sdesc *init_sdesc(struct crypto_shash *alg)
 {
-    struct sdesc *sdesc;
-    int size;
+	struct sdesc *sdesc;
+	int size;
 
-    size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
-    sdesc = kmalloc(size, GFP_KERNEL);
-    if (!sdesc)
-        return ERR_PTR(-ENOMEM);
-    sdesc->shash.tfm = alg;
-    sdesc->shash.flags = 0x0;
-    return sdesc;
+	size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
+	sdesc = kmalloc(size, GFP_KERNEL);
+	if (!sdesc)
+		return ERR_PTR(-ENOMEM);
+	sdesc->shash.tfm = alg;
+	sdesc->shash.flags = 0x0;
+	return sdesc;
 }
 
 static int calc_hash(struct crypto_shash *alg,
              const unsigned char *data, unsigned int datalen,
              unsigned char *digest)
 {
-    struct sdesc *sdesc;
-    int ret;
+	struct sdesc *sdesc;
+	int ret;
 
-    sdesc = init_sdesc(alg);
-    if (IS_ERR(sdesc)) {
-        pr_info("can't alloc sdesc\n");
-        return PTR_ERR(sdesc);
-    }
+	sdesc = init_sdesc(alg);
+	if (IS_ERR(sdesc)) {
+		pr_info("can't alloc sdesc\n");
+		return PTR_ERR(sdesc);
+	}
 
-    ret = crypto_shash_digest(&sdesc->shash, data, datalen, digest);
-    kfree(sdesc);
-    return ret;
+	ret = crypto_shash_digest(&sdesc->shash, data, datalen, digest);
+	kfree(sdesc);
+	return ret;
 }
 
 /*
@@ -111,25 +104,27 @@ Test function, data is the data for hash, datalen is the data length, and digest
 //             unsigned char *digest)
 
 // Fingerprinting.
-int nova_dedup_fingerprint(char *datapage, char *ret_fingerprint)
+//int nova_dedup_fingerprint(char *datapage, char *ret_fingerprint)
+int nova_dedup_fingerprint(unsigned char *datapage, unsigned char *ret_fingerprint)	// char -> unsigned char.
 {
-    struct crypto_shash *alg;
-    char *hash_alg_name = "sha1";
-    int ret;
+	struct crypto_shash *alg;
+	char *hash_alg_name = "sha1";
+	int ret;
 
-    alg = crypto_alloc_shash(hash_alg_name, 0, 0);
-    if (IS_ERR(alg)) {
-            pr_info("can't alloc alg %s\n", hash_alg_name);
-            return PTR_ERR(alg);
-    }
+	alg = crypto_alloc_shash(hash_alg_name, 0, 0);
+	if (IS_ERR(alg)) {
+		pr_info("can't alloc alg %s\n", hash_alg_name);
+		return PTR_ERR(alg);
+	}
 //  ret = calc_hash(alg, data, datalen, digest);
-    ret = calc_hash(alg, datapage, DATABLOCK_SIZE, ret_fingerprint);	// DEDUP //
-    crypto_free_shash(alg);
-    return ret;
+	ret = calc_hash(alg, datapage, DATABLOCK_SIZE, ret_fingerprint);	// DEDUP //
+	crypto_free_shash(alg);
+	return ret;
 }
 
 
 // Append a new Dedup-Table entry.
+/*
 ssize_t dedup_table_update (struct file *file, const void *buf, size_t count, loff_t *pos)
 {
 	mm_segment_t old_fs;
@@ -162,9 +157,10 @@ ssize_t dedup_table_update (struct file *file, const void *buf, size_t count, lo
 	set_fs(old_fs);
 	return ret;
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////
 
-
+// Actual DEDUPLICATION-Service function //
 int nova_dedup_test(struct file *filp)
 {
 	// for Radix-tree
@@ -180,43 +176,69 @@ int nova_dedup_test(struct file *filp)
 //	struct nova_sb_info *sbi = NOVA_SB(sb);
 
 	// for write-entry
-	struct nova_file_write_entry *target_entry;
-	u64 entry_address;
-	char *buf;		// buffer space.
-	char *fingerprint;	// fp space.
+	struct nova_file_write_entry *target_entry;	// Target write-entry to be deduplicated.
+	struct inode *target_inode;			// inode of target write-entry.
+	u64 entry_address;			// Address of target write-entry.
+	u64 target_inode_number = 0;		// target inode number.
+
+	struct nova_inode *target_pi;		// nova_inode of target inode.
+	struct nova_inode_info *target_si;
+	struct nova_inode_info_header *target_sih;
+
+	char *buf;		// Read buffer space.
+	char *fingerprint;	// FP result space.
+
 	unsigned long left;
 	pgoff_t index;		// page offset.
 	int i, j, data_page_number = 0;
 	unsigned long nvmm;
 	void *dax_mem = NULL;
 
-	printk("fs/nova/dedup.c\n");
-
+printk("fs/nova/dedup.c\n");
 printk("Initialize buffer, and fingerprint\n");
-	buf = kmalloc(DATABLOCK_SIZE, GFP_KERNEL);	// 4KB-size buffer allocated.
+
+	buf = kmalloc(DATABLOCK_SIZE, GFP_KERNEL);		// 4KB-size buffer allocated.
 	fingerprint = kmalloc(FINGERPRINT_SIZE, GFP_KERNEL);	// 20B-size fp space allocated.
 
-	// Pop write Entry.
-	entry_address = nova_dedup_queue_get_next_entry();
+	// Pop target write-entry.
+	entry_address = nova_dedup_queue_get_next_entry(&target_inode_number);		// parameter added.
 
 	if (entry_address != 0) {
 		///// Should lock the file corresponding to write entry.
+		
+		target_inode = nova_iget(sb, target_inode_number);	//[yc] getting an inode which is corresponding to the target_inode_number.??!
+		target_si = NOVA_I(target_inode);		// DRAM state for a target_inode.
+		target_sih = &target_si->header;		// DRAM state for a target_inode header.
+		target_pi = nova_get_inode(sb, target_inode);
 
-		// Read write_entry.
+		// Acquiring READ lock.
+		INIT_TIMING(dax_read_time);
+		NOVA_START_TIMING(dax_read_t, dax_read_time);
+		inode_lock_shared(target_inode);
+
+	printk("inode number?: %llu \n", target_pi->nova_ino);
+		// Read target write-entry.
 		target_entry = nova_get_block(sb, entry_address);
-		printk("write-entry block info: num_pages: %d, block: %lld, pgoff: %lld\n", target_entry->num_pages, target_entry->block, target_entry->pgoff);
+	printk("sizeof(nova_file_write_entry) : %ld \n", sizeof(struct nova_file_write_entry));
+	printk("write-entry block info: num_pages: %d, block: %lld, pgoff: %lld\n", target_entry->num_pages, target_entry->block, target_entry->pgoff);
+
 		// Read 4096 Bytes from a write-entry.
-		index = target_entry->pgoff;
-		data_page_number = target_entry->num_pages;
+		index = target_entry->pgoff;	// index: file offset at the beginning of this write.
+		data_page_number = target_entry->num_pages;	// number of pages.
 
 		// iterate as much as # of data pages.
 		for (i = 0; i < data_page_number; i++) {
 	printk("Data Page number %d ! \n", i + 1);
-			// READ path like.
-			nvmm = (unsigned long) (target_entry->block >> PAGE_SHIFT) + index - target_entry->pgoff;
-			dax_mem = nova_get_block (sb, (nvmm << PAGE_SHIFT));
+
+			// --- //
 			memset(buf, 0, DATABLOCK_SIZE);
 			memset(fingerprint, 0, FINGERPRINT_SIZE);
+
+			// READ path like: Resolving the target address. //
+//			nvmm = (unsigned long) (target_entry->block >> PAGE_SHIFT) + index - target_entry->pgoff;
+			nvmm = get_nvmm(sb, target_sih, target_entry, index);
+			dax_mem = nova_get_block (sb, (nvmm << PAGE_SHIFT));
+
 			left = __copy_to_user(buf, dax_mem, DATABLOCK_SIZE);	// PMEM to DRAM.
 
 			if (left) {
@@ -229,21 +251,30 @@ printk("Initialize buffer, and fingerprint\n");
 			nova_dedup_fingerprint(buf, fingerprint);
 	printk("Fingerprint End \n");
 			// Print Fp.
-			for (i = 0; i < FINGERPRINT_SIZE; i++) {
-				printk("%08x", fingerprint[i]);
+			for (j = 0; j < FINGERPRINT_SIZE; j++) {
+				printk("%d: %02X \n", j, fingerprint[j]);
+				//printk("%08x", fingerprint[j]);
 			}
 			printk("\n");
 
 	//		printk("%c %c %c\n", buf[0], buf[1], buf[2]);
 			index++;
 		}
+		// TODO Lookup for duplicate datapages.
+		// TODO add new 'DEDUP-table' entries.
+
+		// READ Unlock.
+		inode_unlock_shared(target_inode);
+		NOVA_END_TIMING(dax_read_t, dax_read_time);
 	}
-	else printk("no entry");
+	else {
+		printk("no entry \n");
+	}
 
 	// DEDUP-TABLE should be updated.
 
 //	dedup_table_update(filp, buf, 32, &filp->f_pos);
-	printk("Dedup-Table update finished \n");
+//	printk("Dedup-Table update finished \n");
  
 	// testing) assumes that Dedup-Queue-entry address is ~~~.
 //	if (nova_dedup_queue_get_next_entry() != 0) { }
@@ -268,3 +299,4 @@ printk("Initialize buffer, and fingerprint\n");
 	kfree(fingerprint);	// memory free for fp space.
 	return 0;
 }
+

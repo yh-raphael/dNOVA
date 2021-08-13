@@ -426,9 +426,9 @@ static int nova_append_log_entry(struct super_block *sb,
 	if (curr_p == 0)
 		return -ENOSPC;
 // DEDUP //
-if (type == FILE_WRITE) {
-	nova_dedup_queue_push(curr_p);
-}
+//if (type == FILE_WRITE) {
+//	nova_dedup_queue_push(curr_p);
+//}
 // DEDUP //
 	nova_dbg_verbose("%s: inode %lu attr change entry @ 0x%llx\n",
 				__func__, sih->ino, curr_p);
@@ -464,8 +464,10 @@ if (type == FILE_WRITE) {
 	// The Write-Entries that are being undergone deduplication should not be here.
 	// Check 'dedup_flag'
 	if (type == FILE_WRITE) {
-		if (target_entry->dedup_flag == 0)
-			nova_dedup_queue_push(curr_p);
+		if (target_entry->dedup_flag == 0) {
+		printk("fs/nova/log.c -> nova_append_log_entry() \n");
+			nova_dedup_queue_push(curr_p, pi->nova_ino);	// parameter added.
+		}
 	}
 	///////////////////////////////////////////////
 	return 0;

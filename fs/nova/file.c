@@ -742,8 +742,8 @@ printk("total_blocks : %ld \n", total_blocks);
 	update.alter_tail = sih->alter_log_tail;
 	while (num_blocks > 0) {		// [yhc] 남아있는 block이 있다면,
 		printk("NOVAAA : helloo\n");	// [yhc] mnt시 dmesg로 확인.
-test_hash("hello dedup nova", 16, digest);
-printk("***Dedup Hash: test_hash() -> %s \n", digest);	// hash testing.
+//test_hash("hello dedup nova", 16, digest);
+//printk("***Dedup Hash: test_hash() -> %s \n", digest);	// hash testing.
 printk("num_blocks : %ld\n", num_blocks);
 		offset = pos & (nova_inode_blk_size(sih) - 1);
 		start_blk = pos >> sb->s_blocksize_bits;		//[yc] pos에 위치정보 계속 유지하겟군.
@@ -1081,10 +1081,10 @@ const struct inode_operations nova_file_inode_operations = {
 	.get_acl	= NULL,
 };
 /*** DEDUP ***/
-struct sdesc {
-    struct shash_desc shash;
-    char ctx[];
-};
+//struct sdesc {
+//    struct shash_desc shash;
+//    char ctx[];
+//};
 
 static struct sdesc *init_sdesc(struct crypto_shash *alg)
 {

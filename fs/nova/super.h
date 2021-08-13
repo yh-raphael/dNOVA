@@ -175,9 +175,9 @@ struct nova_sb_info {
 	struct free_list *free_lists;
 	unsigned long per_list_blocks;
 
-	/* For Deduplication YC*/
-	struct radix_tree_root dedup_tree_fingerprint;
-	struct radix_tree_root dedup_tree_address;
+	///// For Deduplication YC /////
+	// struct radix_tree_root dedup_tree_fingerprint;
+	// struct radix_tree_root dedup_tree_address;
 };
 
 static inline struct nova_sb_info *NOVA_SB(struct super_block *sb)

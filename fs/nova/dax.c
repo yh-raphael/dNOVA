@@ -723,7 +723,7 @@ ssize_t do_nova_inplace_file_write(struct file *filp,
 						blocknr, time, file_size);
 
 			/////////// DEDUP //////////////////
-			entry_data.dedup_flag = 2;		/////////// what does this mean???
+		//	entry_data.dedup_flag = 2;		/////////// what does this mean???
 			////////////////////////////////////
 
 			ret = nova_append_file_write_entry(sb, pi, inode,
