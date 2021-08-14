@@ -568,6 +568,7 @@ do_dax_mapping_read(struct file *filp, char __user *buf,
 		}
 
 		nvmm = get_nvmm(sb, sih, entryc, index);		// [yhc] Resolve the address of target position excluding super_block.
+printk("index: %x \n", index);
 printk("nvmm: %x \n", nvmm);
 		dax_mem = nova_get_block(sb, (nvmm << PAGE_SHIFT));	// [yhc] Resolve the address of target block in PMEM.
 printk("dax_mem: %x \n", dax_mem);
@@ -746,6 +747,7 @@ printk("total_blocks : %ld \n", total_blocks);
 //printk("***Dedup Hash: test_hash() -> %s \n", digest);	// hash testing.
 printk("num_blocks : %ld\n", num_blocks);
 		offset = pos & (nova_inode_blk_size(sih) - 1);
+printk("writing offset %lld \n", pos);
 		start_blk = pos >> sb->s_blocksize_bits;		//[yc] pos에 위치정보 계속 유지하겟군.
 
 		/* don't zero-out the allocated blocks */

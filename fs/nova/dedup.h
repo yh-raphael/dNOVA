@@ -25,6 +25,8 @@
 #define DATABLOCK_SIZE		4096
 #define FINGERPRINT_SIZE	20
 
+#define MAX_DATAPAGE_PER_WRITEENTRY 32
+
 //struct dedup_node {
 //	long long dedup_table_entry;
 //};

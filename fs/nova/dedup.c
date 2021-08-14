@@ -1,5 +1,4 @@
 #include "dedup.h"
-#include <linux/rbtree.h>
 
 // struct rb_node temp_rb_node;
 struct nova_dedup_queue nova_dedup_queue_head;
@@ -194,82 +193,114 @@ int nova_dedup_test(struct file *filp)
 	unsigned long nvmm;
 	void *dax_mem = NULL;
 
+	// For new write-entry.
+	int new_entry_num = 0;
+	u64 new_entry_address[MAX_DATAPAGE_PER_WRITEENTRY];
+
 printk("fs/nova/dedup.c\n");
 printk("Initialize buffer, and fingerprint\n");
 
 	buf = kmalloc(DATABLOCK_SIZE, GFP_KERNEL);		// 4KB-size buffer allocated.
 	fingerprint = kmalloc(FINGERPRINT_SIZE, GFP_KERNEL);	// 20B-size fp space allocated.
 
-	// Pop target write-entry.
-	entry_address = nova_dedup_queue_get_next_entry(&target_inode_number);		// parameter added.
+	do {
+		// Pop target write-entry.
+		entry_address = nova_dedup_queue_get_next_entry(&target_inode_number);		// parameter added.
+		new_entry_num = 0;
+		memset(new_entry_address, 0, MAX_DATAPAGE_PER_WRITEENTRY * 8);
 
-	if (entry_address != 0) {
-		///// Should lock the file corresponding to write entry.
-		
-		target_inode = nova_iget(sb, target_inode_number);	//[yc] getting an inode which is corresponding to the target_inode_number.??!
-		target_si = NOVA_I(target_inode);		// DRAM state for a target_inode.
-		target_sih = &target_si->header;		// DRAM state for a target_inode header.
-		target_pi = nova_get_inode(sb, target_inode);
-
-		// Acquiring READ lock.
-		INIT_TIMING(dax_read_time);
-		NOVA_START_TIMING(dax_read_t, dax_read_time);
-		inode_lock_shared(target_inode);
-
-	printk("inode number?: %llu \n", target_pi->nova_ino);
-		// Read target write-entry.
-		target_entry = nova_get_block(sb, entry_address);
-	printk("sizeof(nova_file_write_entry) : %ld \n", sizeof(struct nova_file_write_entry));
-	printk("write-entry block info: num_pages: %d, block: %lld, pgoff: %lld\n", target_entry->num_pages, target_entry->block, target_entry->pgoff);
-
-		// Read 4096 Bytes from a write-entry.
-		index = target_entry->pgoff;	// index: file offset at the beginning of this write.
-		data_page_number = target_entry->num_pages;	// number of pages.
-
-		// iterate as much as # of data pages.
-		for (i = 0; i < data_page_number; i++) {
-	printk("Data Page number %d ! \n", i + 1);
-
-			// --- //
-			memset(buf, 0, DATABLOCK_SIZE);
-			memset(fingerprint, 0, FINGERPRINT_SIZE);
-
-			// READ path like: Resolving the target address. //
-//			nvmm = (unsigned long) (target_entry->block >> PAGE_SHIFT) + index - target_entry->pgoff;
-			nvmm = get_nvmm(sb, target_sih, target_entry, index);
-			dax_mem = nova_get_block (sb, (nvmm << PAGE_SHIFT));
-
-			left = __copy_to_user(buf, dax_mem, DATABLOCK_SIZE);	// PMEM to DRAM.
-
-			if (left) {
-				nova_dbg("%s ERROR!: left %lu\n", __func__, left);
-				return 0;
-			}
-
-	printk("Fingerprint Start \n");
-			// Make Fingerprint
-			nova_dedup_fingerprint(buf, fingerprint);
-	printk("Fingerprint End \n");
-			// Print Fp.
-			for (j = 0; j < FINGERPRINT_SIZE; j++) {
-				printk("%d: %02X \n", j, fingerprint[j]);
-				//printk("%08x", fingerprint[j]);
-			}
-			printk("\n");
-
-	//		printk("%c %c %c\n", buf[0], buf[1], buf[2]);
-			index++;
+		// target_inode_number should exist.
+		if (target_inode_number < NOVA_NORMAL_INODE_START && target_inode_number != NOVA_ROOT_INO) {
+			//
+			printk("No entry! \n");
+			continue;
 		}
-		// TODO Lookup for duplicate datapages.
-		// TODO add new 'DEDUP-table' entries.
 
-		// READ Unlock.
-		inode_unlock_shared(target_inode);
-		NOVA_END_TIMING(dax_read_t, dax_read_time);
-	}
-	else {
-		printk("no entry \n");
-	}
+		if (entry_address != 0) {
+			///// Should lock the file corresponding to write entry.
+	
+			target_inode = nova_iget(sb, target_inode_number);	//[yc] getting an inode which is corresponding to the target_inode_number.??!
+			// Inode could have been deleted.
+			if (target_inode == ERR_PTR(-ESTALE)) {			//[yc] error message.
+				nova_info("%s: inode %llu does not exist.", __func__, target_inode_number);
+				continue;
+			}
+
+			target_si = NOVA_I(target_inode);		// DRAM state for a target_inode.
+			target_sih = &target_si->header;		// DRAM state for a target_inode header.
+			target_pi = nova_get_inode(sb, target_inode);
+
+		printk("inode number?: %llu \n", target_pi->nova_ino);
+			// Acquiring READ lock.
+			INIT_TIMING(dax_read_time);
+			NOVA_START_TIMING(dax_read_t, dax_read_time);
+			inode_lock_shared(target_inode);
+
+			// Read target write-entry.
+			target_entry = nova_get_block(sb, entry_address);
+
+		printk("sizeof(nova_file_write_entry) : %ld \n", sizeof(struct nova_file_write_entry));
+		printk("write-entry block info: num_pages: %d, block: %lld, pgoff: %lld\n", target_entry->num_pages, target_entry->block, target_entry->pgoff);
+
+			// Read 4096 Bytes from a write-entry.
+			index = target_entry->pgoff;	// index: file offset at the beginning of this write.
+			data_page_number = target_entry->num_pages;	// number of pages.
+
+			// iterate as much as # of data pages.
+			for (i = 0; i < data_page_number; i++) {
+
+		printk("Data Page number %d ! \n", i + 1);
+
+				// --- //
+				memset(buf, 0, DATABLOCK_SIZE);
+				memset(fingerprint, 0, FINGERPRINT_SIZE);
+
+				// READ path like: Resolving the target address. //
+				//nvmm = (unsigned long) (target_entry->block >> PAGE_SHIFT) + index - target_entry->pgoff;
+				nvmm = get_nvmm(sb, target_sih, target_entry, index);
+				dax_mem = nova_get_block (sb, (nvmm << PAGE_SHIFT));
+
+				left = __copy_to_user(buf, dax_mem, DATABLOCK_SIZE);	// PMEM to DRAM.
+				if (left) {
+					nova_dbg("%s ERROR!: left %lu\n", __func__, left);
+					return 0;
+				}
+
+		printk("Fingerprint Start \n");
+				// Make Fingerprint
+				nova_dedup_fingerprint(buf, fingerprint);
+
+		printk("Fingerprint End \n");
+				// Print Fp.
+				for (j = 0; j < FINGERPRINT_SIZE; j++) {
+					printk("%d: %02X \n", j, fingerprint[j]);
+					//printk("%08x", fingerprint[j]);
+				}
+				printk("\n");
+				//printk("%c %c %c\n", buf[0], buf[1], buf[2]);
+				index++;
+			}
+
+			// TODO Lookup for duplicate datapages.
+			// TODO add new 'DEDUP-table' entries.
+
+			// READ Unlock.
+			inode_unlock_shared(target_inode);
+			NOVA_END_TIMING(dax_read_t, dax_read_time);
+			
+			// No more READ!!
+
+			// TODO Write Lock
+			// TODO append new write-entries
+			// TODO update tail
+			// TODO update 'update-count', 'reference count'
+			// TODO update 'dedup-flag' - inplace
+			// TODO Write Unlock
+		}
+		else {
+			printk("no entry \n");
+		}
+	} while (0);
 
 	// DEDUP-TABLE should be updated.
 
@@ -300,3 +331,8 @@ printk("Initialize buffer, and fingerprint\n");
 	return 0;
 }
 
+// TODO
+// Implementation : How are we going to make the 'dedup table'? --> Static Table
+// Design : How to search 'dedup table' for deduplication -> indexing.
+// Design : How to search 'dedup table' for deletion -> indirect indexing.
+// Implementation : How to gain file lock from 'write entry' -> nova_get_inode, nova_iget
