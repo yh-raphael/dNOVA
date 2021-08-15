@@ -189,13 +189,14 @@ int nova_dedup_test(struct file *filp)
 
 	unsigned long left;
 	pgoff_t index;		// page offset.
-	int i, j, data_page_number = 0;
+	int i, j, num_pages = 0;
 	unsigned long nvmm;
 	void *dax_mem = NULL;
 
 	// For new write-entry.
 	int new_entry_num = 0;
 	u64 new_entry_address[MAX_DATAPAGE_PER_WRITEENTRY];
+	struct fingerprint_lookup_data *lookup_data;
 
 printk("fs/nova/dedup.c\n");
 printk("Initialize buffer, and fingerprint\n");
@@ -231,6 +232,9 @@ printk("Initialize buffer, and fingerprint\n");
 			target_pi = nova_get_inode(sb, target_inode);
 
 		printk("inode number?: %llu \n", target_pi->nova_ino);
+
+			// TODO cross check inode <-> write-entry //??!
+
 			// Acquiring READ lock.
 			INIT_TIMING(dax_read_time);
 			NOVA_START_TIMING(dax_read_t, dax_read_time);
@@ -244,10 +248,13 @@ printk("Initialize buffer, and fingerprint\n");
 
 			// Read 4096 Bytes from a write-entry.
 			index = target_entry->pgoff;	// index: file offset at the beginning of this write.
-			data_page_number = target_entry->num_pages;	// number of pages.
+			num_pages = target_entry->num_pages;	// number of pages.
+
+			// allocating a kernel space for Fingerprint lookup.
+			lookup_data = kmalloc(num_pages * sizeof(struct fingerprint_lookup_data), GFP_KERNEL);
 
 			// iterate as much as # of data pages.
-			for (i = 0; i < data_page_number; i++) {
+			for (i = 0; i < num_pages; i++) {
 
 		printk("Data Page number %d ! \n", i + 1);
 
@@ -273,15 +280,23 @@ printk("Initialize buffer, and fingerprint\n");
 		printk("Fingerprint End \n");
 				// Print Fp.
 				for (j = 0; j < FINGERPRINT_SIZE; j++) {
-					printk("%d: %02X \n", j, fingerprint[j]);
+					//printk("%d: %02X \n", j, fingerprint[j]);
 					//printk("%08x", fingerprint[j]);
+					lookup_data[i].fingerprint[j] = fingerprint[j];
 				}
-				printk("\n");
+				//printk("\n");
 				//printk("%c %c %c\n", buf[0], buf[1], buf[2]);
 				index++;
 			}
 
 			// TODO Lookup for duplicate datapages.
+			for (i = 0; i < num_pages; i++) {
+				for (j = 0; j < FINGERPRINT_SIZE; j++) {
+					printk("%02X", lookup_data[i].fingerprint[j]);
+				}
+				printk("\n");
+			}
+
 			// TODO add new 'DEDUP-table' entries.
 
 			// READ Unlock.
@@ -291,11 +306,27 @@ printk("Initialize buffer, and fingerprint\n");
 			// No more READ!!
 
 			// TODO Write Lock
+			INIT_TIMING(time);
+			NOVA_START_TIMING(cow_write_t, time);
+			sb_start_write(target_inode->i_sb);
+			inode_lock(target_inode);
+
 			// TODO append new write-entries
+			/* Should Know
+				- how many entries are needed.
+				- where is the starting block address.
+				- dedup_flag should be set to 2.
+				- num_pages are 1.
+			*/
+
 			// TODO update tail
 			// TODO update 'update-count', 'reference count'
 			// TODO update 'dedup-flag' - inplace
+
 			// TODO Write Unlock
+			inode_unlock(target_inode);
+			sb_end_write(target_inode->i_sb);
+			NOVA_END_TIMING(cow_write_t, time);
 		}
 		else {
 			printk("no entry \n");

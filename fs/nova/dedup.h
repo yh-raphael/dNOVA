@@ -45,6 +45,12 @@ struct sdesc {
     char ctx[];
 };
 
+// For Fingerprint lookup. //
+struct fingerprint_lookup_data {
+	unsigned char fingerprint[FINGERPRINT_SIZE];
+	u64 FACT_table_entry_address;
+};
+
 extern struct nova_dedup_queue nova_dedup_queue_head;
 
 // NOVA_DEDUP_RADIX_TREE_NODE.
