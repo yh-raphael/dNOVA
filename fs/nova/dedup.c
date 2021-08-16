@@ -121,6 +121,17 @@ int nova_dedup_fingerprint(unsigned char *datapage, unsigned char *ret_fingerpri
 	return ret;
 }
 
+// Return the number of new write-entries needed.
+int nova_dedup_num_new_write_entry(bool *target, int num_pages)
+{
+	int ret = 1;
+	int i;
+	for (i = 0; i < num_pages - 1; i++) {
+		if (target[i] != target[i+1])
+			ret ++;
+	}
+	return ret;
+}
 
 // Append a new Dedup-Table entry.
 /*
@@ -194,9 +205,10 @@ int nova_dedup_test(struct file *filp)
 	void *dax_mem = NULL;
 
 	// For new write-entry.
-	int new_entry_num = 0;
-	u64 new_entry_address[MAX_DATAPAGE_PER_WRITEENTRY];
+	int num_new_entry = 0;
+	//u64 new_entry_address[MAX_DATAPAGE_PER_WRITEENTRY];
 	struct fingerprint_lookup_data *lookup_data;
+	bool *duplicate_check;
 
 printk("fs/nova/dedup.c\n");
 printk("Initialize buffer, and fingerprint\n");
@@ -207,8 +219,8 @@ printk("Initialize buffer, and fingerprint\n");
 	do {
 		// Pop target write-entry.
 		entry_address = nova_dedup_queue_get_next_entry(&target_inode_number);		// parameter added.
-		new_entry_num = 0;
-		memset(new_entry_address, 0, MAX_DATAPAGE_PER_WRITEENTRY * 8);
+		num_new_entry = 0;
+		//memset(new_entry_address, 0, MAX_DATAPAGE_PER_WRITEENTRY * 8);
 
 		// target_inode_number should exist.
 		if (target_inode_number < NOVA_NORMAL_INODE_START && target_inode_number != NOVA_ROOT_INO) {
@@ -289,15 +301,21 @@ printk("Initialize buffer, and fingerprint\n");
 				index++;
 			}
 
+			duplicate_check = kmalloc(sizeof(bool) * num_pages, GFP_KERNEL);
+			memset(duplicate_check, false, sizeof(bool) * num_pages);
+
 			// TODO Lookup for duplicate datapages.
+			// TODO add new 'DEDUP-table' entries.
+
+			num_new_entry = nova_dedup_num_new_write_entry(duplicate_check, num_pages);
+
+			// <DEBUG>
 			for (i = 0; i < num_pages; i++) {
 				for (j = 0; j < FINGERPRINT_SIZE; j++) {
 					printk("%02X", lookup_data[i].fingerprint[j]);
 				}
 				printk("\n");
 			}
-
-			// TODO add new 'DEDUP-table' entries.
 
 			// READ Unlock.
 			inode_unlock_shared(target_inode);
@@ -319,6 +337,10 @@ printk("Initialize buffer, and fingerprint\n");
 				- num_pages are 1.
 			*/
 
+			for (i = 0; i < num_new_entry; i++) {
+
+			}
+
 			// TODO update tail
 			// TODO update 'update-count', 'reference count'
 			// TODO update 'dedup-flag' - inplace
@@ -327,6 +349,10 @@ printk("Initialize buffer, and fingerprint\n");
 			inode_unlock(target_inode);
 			sb_end_write(target_inode->i_sb);
 			NOVA_END_TIMING(cow_write_t, time);
+
+			kfree(lookup_data);
+			kfree(duplicate_check);
+			kfree(target_inode);
 		}
 		else {
 			printk("no entry \n");
