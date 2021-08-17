@@ -568,10 +568,14 @@ do_dax_mapping_read(struct file *filp, char __user *buf,
 		}
 
 		nvmm = get_nvmm(sb, sih, entryc, index);		// [yhc] Resolve the address of target position excluding super_block.
-printk("index: %x \n", index);
-printk("nvmm: %x \n", nvmm);
+
+	printk("Reading %lu pages from entry %lu \n", entry->num_pages, entry->pgoff);
+	printk("index: %x \n", index);
+	printk("nvmm: %x \n", nvmm);
+
 		dax_mem = nova_get_block(sb, (nvmm << PAGE_SHIFT));	// [yhc] Resolve the address of target block in PMEM.
-printk("dax_mem: %x \n", dax_mem);
+
+	printk("dax_mem: %x \n", dax_mem);
 
 memcpy:
 		nr = nr - offset;					// [yhc] Calculates actual amount that should be read.

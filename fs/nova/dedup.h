@@ -68,9 +68,6 @@ extern struct nova_dedup_queue nova_dedup_queue_head;
 //	int flag;		// 4B
 //};
 
-// Debugging function for testing.
-int nova_dedup_test (struct file*);
-
 // Dedup-queue related.
 int nova_dedup_queue_init (void);
 int nova_dedup_queue_push (u64, u64);	// parameter added.
@@ -79,6 +76,11 @@ u64 nova_dedup_queue_get_next_entry (u64 *);
 // Radix-tree for searching D-table entry related.
 //void nova_dedup_init_radix_tree_node (struct nova_dedup_radix_tree_node *, loff_t);
 
-void nova_fingerprint (char *, char *);
+int nova_dedup_fingerprint (unsigned char *datapage, unsigned char *ret_fingerprint);
+int nova_dedup_num_new_write_entry(bool *target, int num_pages);
+int nova_dedup_update_FACT(struct super_block *sb, struct nova_inode_info_header * sih, u64 begin_tail);
+
+// Debugging function for testing.
+int nova_dedup_test (struct file*);
 
 #endif
