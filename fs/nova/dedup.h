@@ -47,8 +47,9 @@ struct sdesc {
 
 // For Fingerprint lookup. //
 struct fingerprint_lookup_data {
-	unsigned char fingerprint[FINGERPRINT_SIZE];
-	u64 FACT_table_entry_address;
+	unsigned char fingerprint[FINGERPRINT_SIZE];	// fingerprint of entry
+	u64 FACT_table_entry_index;			// index of entry
+	__le64 block;					// Actual address of this entry (Where the data block is)
 };
 
 extern struct nova_dedup_queue nova_dedup_queue_head;
@@ -77,7 +78,7 @@ u64 nova_dedup_queue_get_next_entry (u64 *);
 //void nova_dedup_init_radix_tree_node (struct nova_dedup_radix_tree_node *, loff_t);
 
 int nova_dedup_fingerprint (unsigned char *datapage, unsigned char *ret_fingerprint);
-int nova_dedup_num_new_write_entry(bool *target, int num_pages);
+int nova_dedup_num_new_write_entry(short *target, int num_pages);
 int nova_dedup_update_FACT(struct super_block *sb, struct nova_inode_info_header * sih, u64 begin_tail);
 
 // Debugging function for testing.

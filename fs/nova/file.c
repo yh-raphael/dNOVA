@@ -569,13 +569,13 @@ do_dax_mapping_read(struct file *filp, char __user *buf,
 
 		nvmm = get_nvmm(sb, sih, entryc, index);		// [yhc] Resolve the address of target position excluding super_block.
 
-	printk("Reading %lu pages from entry %lu \n", entry->num_pages, entry->pgoff);
-	printk("index: %x \n", index);
-	printk("nvmm: %x \n", nvmm);
+	printk("Reading %u pages from entry %llu \n", entry->num_pages, entry->pgoff);
+	printk("Reading the time: %lld \n", inode->i_ctime.tv_sec);//???!
+	printk("index: %ld, nvmm: %ld \n", index, nvmm);
 
 		dax_mem = nova_get_block(sb, (nvmm << PAGE_SHIFT));	// [yhc] Resolve the address of target block in PMEM.
 
-	printk("dax_mem: %x \n", dax_mem);
+	printk("dax_mem: %p \n", dax_mem);
 
 memcpy:
 		nr = nr - offset;					// [yhc] Calculates actual amount that should be read.
@@ -685,7 +685,7 @@ static ssize_t do_nova_cow_file_write(struct file *filp,
 	u32 time;
 	unsigned long irq_flags = 0;
 //DEDUP//
-unsigned char digest[40];
+//unsigned char digest[40];
 
 	if (len == 0)
 		return 0;
@@ -703,7 +703,7 @@ printk("starting offset: %lld \n", pos);	//[yc].
 
 	count = len;						// [yhc] 'count' saves the input length info.
 printk("count : %ld \n",count);
-printk("pos : %ld \n",pos);
+printk("pos : %lld \n",pos);
 	pi = nova_get_block(sb, sih->pi_addr);			// [yhc] pi_addr: address in PMEM of an inode.
 
 	/* nova_inode tail pointer will be updated and we make sure all other
@@ -737,6 +737,10 @@ printk("total_blocks : %ld \n", total_blocks);
 		goto out;
 
 	inode->i_ctime = inode->i_mtime = current_time(inode);
+
+printk("log head: %llu \n", pi->log_head);
+printk("write ctime: %lld \n", inode->i_ctime.tv_sec);
+
 	time = current_time(inode).tv_sec;
 
 	nova_dbgv("%s: inode %lu, offset %lld, count %lu\n",
@@ -758,7 +762,7 @@ printk("writing offset %lld \n", pos);
 		allocated = nova_new_data_blocks(sb, sih, &blocknr, start_blk,
 				 num_blocks, ALLOC_NO_INIT, ANY_CPU,
 				 ALLOC_FROM_HEAD);
-printk("allocated: %ld\n", allocated);
+printk("allocated: %d\n", allocated);
 		nova_dbg_verbose("%s: alloc %d blocks @ %lu\n", __func__,
 						allocated, blocknr);
 
@@ -1091,7 +1095,7 @@ const struct inode_operations nova_file_inode_operations = {
 //    struct shash_desc shash;
 //    char ctx[];
 //};
-
+/*
 static struct sdesc *init_sdesc(struct crypto_shash *alg)
 {
     struct sdesc *sdesc;
@@ -1124,9 +1128,9 @@ static int calc_hash(struct crypto_shash *alg,
     return ret;
 }
 
-/*
-Test function, data is the data for hash, datalen is the data length, and digest is the sha1 result (is an out variable)
-*/
+
+//Test function, data is the data for hash, datalen is the data length, and digest is the sha1 result (is an out variable)
+
 static int test_hash(const unsigned char *data, unsigned int datalen,
              unsigned char *digest)
 {
@@ -1143,3 +1147,4 @@ static int test_hash(const unsigned char *data, unsigned int datalen,
     crypto_free_shash(alg);
     return ret;
 }
+*/
