@@ -19,7 +19,7 @@ int nova_dedup_queue_push(u64 new_address, u64 target_inode_number)
 	list_add_tail(&new_data->list, &nova_dedup_queue_head.list);		// add to the list.
 	new_data->write_entry_address = new_address;				// save the contents.
 	new_data->target_inode_number = target_inode_number;
-	printk("PUSH a write entry to the D-Queue: %llu, %llu\n", new_address, target_inode_number);
+	printk("PUSH a write entry to the D-Queue => Write-entry address: %llu, inode number: %llu\n", new_address, target_inode_number);
 	return 0;
 }
 
@@ -39,7 +39,7 @@ u64 nova_dedup_queue_get_next_entry(u64 *target_inode_number)
 		// delete from the list.
 		list_del(nova_dedup_queue_head.list.next);	// dequeue the first element, [DEBUG] The problem>??
 		kfree(ptr);	//
-	printk("POP from queue: %llu, %llu \n", ret, *target_inode_number);
+	printk("POP from queue => Write-entry address: %llu, inode number: %llu \n", ret, *target_inode_number);
 	}
 	return ret;
 }
@@ -436,6 +436,7 @@ printk("Initialize buffer, and fingerprint\n");
 	fingerprint = kmalloc(FINGERPRINT_SIZE, GFP_KERNEL);	// 20B-size fp space allocated.
 
 	do {
+		printk("---------- DEDUP start! ---------- \n");
 		// Pop target write-entry.
 		entry_address = nova_dedup_queue_get_next_entry(&target_inode_number);		// parameter added.
 		//memset(new_entry_address, 0, MAX_DATAPAGE_PER_WRITEENTRY * 8);
@@ -652,7 +653,7 @@ printk("Initialize buffer, and fingerprint\n");
 					file_size -= DATABLOCK_SIZE;
 				}
 
-			// vanila NOVA WRITE path like //
+				// vanila NOVA WRITE path like //
 				printk("NEW WRITE ENTRY: start pgoff: %lu, number of pages: %lu \n", start_blk, num_blocks);
 
 				nova_init_file_write_entry(sb, target_sih, &entry_data, epoch_id,
@@ -668,6 +669,7 @@ printk("Initialize buffer, and fingerprint\n");
 					begin_tail = update.curr_entry;
 				valid_page_num -= num_blocks;
 			}
+			// Non-appended pages exist.
 			if (valid_page_num != 0) {
 				printk("Datapage assign error! %d left \n", valid_page_num);
 				goto out;

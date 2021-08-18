@@ -489,6 +489,7 @@ static struct nova_inode *nova_init(struct super_block *sb,
 
 	// DEDUP //
 	nova_dedup_queue_init();	//[yc] initialize Dedup-Queue!
+	nova_info("NOVA DEDUP SERVICE now progressing\n");
 	printk("nova_init() let Dedup Queue init ... in fs/nova/super.c\n");
 	// DEDUP //
 

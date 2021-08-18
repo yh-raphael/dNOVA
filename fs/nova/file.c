@@ -569,9 +569,9 @@ do_dax_mapping_read(struct file *filp, char __user *buf,
 
 		nvmm = get_nvmm(sb, sih, entryc, index);		// [yhc] Resolve the address of target position excluding super_block.
 
-	printk("Reading %u pages from datapage %lu", entry->num_pages, nvmm);
+	printk("READ: Reading pgoff(%lu ~ %lu), from datapage %lu \n", index, index + (nr / PAGE_SIZE) - 1, nvmm);
 	printk("Reading %u pages from pgoff %llu \n", entry->num_pages, entry->pgoff);
-	printk("index: %ld, nvmm: %ld \n", index, nvmm);
+	printk("index: %ld, nvmm(datapage): %ld \n", index, nvmm);
 	//printk("Reading the time: %lld \n", inode->i_ctime.tv_sec);//???!
 
 		dax_mem = nova_get_block(sb, (nvmm << PAGE_SHIFT));	// [yhc] Resolve the address of target block in PMEM.
@@ -756,7 +756,7 @@ printk("write ctime: %lld \n", inode->i_ctime.tv_sec);
 //printk("***Dedup Hash: test_hash() -> %s \n", digest);	// hash testing.
 printk("num_blocks : %ld\n", num_blocks);
 		offset = pos & (nova_inode_blk_size(sih) - 1);
-printk("writing offset %lld \n", pos);
+printk("writing - file offset %lld \n", pos);
 		start_blk = pos >> sb->s_blocksize_bits;		//[yc] pos에 위치정보 계속 유지하겟군.
 
 		/* don't zero-out the allocated blocks */
@@ -773,7 +773,7 @@ printk("allocated: %d\n", allocated);
 			ret = allocated;
 			goto out;
 		}
-printk("sizeof(step): %ld \n", sizeof(step));
+
 		step++;
 		bytes = sb->s_blocksize * allocated - offset;		// [yhc] Subtracting edge block's edge. 
 		if (bytes > count)
@@ -790,7 +790,7 @@ printk("sizeof(step): %ld \n", sizeof(step));
 		}
 		/* Now copy from user buf */
 		//		nova_dbg("Write: %p\n", kmem);
-printk("copied: %ld\n", copied);printk("bytes: %ld\n", bytes);
+printk("bytes: %ld\n", bytes);
 		NOVA_START_TIMING(memcpy_w_nvmm_t, memcpy_time);
 		nova_memunlock_range(sb, kmem + offset, bytes, &irq_flags);
 		copied = bytes - memcpy_to_pmem_nocache(kmem + offset,		// [yhc] copied: saves remaining length.
@@ -811,6 +811,7 @@ printk("after copied: %ld\n",copied);
 		else								//[yc] just overwriting case.
 			file_size = cpu_to_le64(inode->i_size);
 
+printk("WRITE: write %lu(allocated) pages from %lu(start_blk) \n", allocated, start_blk);
 		nova_init_file_write_entry(sb, sih, &entry_data, epoch_id,
 					start_blk, allocated, blocknr, time,
 					file_size);				// [yhc] Initializing 'file write entry'.
