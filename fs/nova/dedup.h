@@ -45,11 +45,20 @@ struct sdesc {
     char ctx[];
 };
 
+// FACT entry //
+struct fact_entry {
+	unsigned char fingerprint[FINGERPRINT_SIZE];
+	u64 block_address;
+	u32 count;		// 28bit - referenceCount, 4bit - updateCount.
+	u32 next;
+	u32 delete_target;
+};
+
 // For Fingerprint lookup. //
 struct fingerprint_lookup_data {
 	unsigned char fingerprint[FINGERPRINT_SIZE];	// fingerprint of entry
-	u64 FACT_table_entry_index;			// index of entry
-	__le64 block;					// Actual address of this entry (Where the data block is)
+	u32 index;					// index of entry
+	u64 block_address;				// Actual address of this entry (Where the data block is)
 };
 
 extern struct nova_dedup_queue nova_dedup_queue_head;
@@ -79,6 +88,12 @@ u64 nova_dedup_queue_get_next_entry (u64 *);
 
 int nova_dedup_fingerprint (unsigned char *datapage, unsigned char *ret_fingerprint);
 int nova_dedup_num_new_write_entry(short *target, int num_pages);
+int nova_dedup_crosscheck(struct nova_file_write_entry *entry, struct nova_inode_info_header *sih, unsigned long pgoff);
+
+int nova_dedup_FACT_read(struct super_block *sb, u64 index);
+int nova_dedup_is_empty(struct fact_entry target);
+int nova_dedup_FACT_insert(struct super_block *sb, struct fingerprint_lookup_data *lookup);
+
 int nova_dedup_update_FACT(struct super_block *sb, struct nova_inode_info_header * sih, u64 begin_tail);
 
 // Debugging function for testing.

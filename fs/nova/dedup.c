@@ -154,7 +154,6 @@ int nova_dedup_crosscheck(struct nova_file_write_entry *entry,
 	pentry = radix_tree_lookup_slot(&sih->tree, pgoff);
 	referenced_entry = radix_tree_deref_slot(pentry);
 
-	// Duplicated case ?!
 	if (referenced_entry == entry)
 		return 1;
 	else {
@@ -166,12 +165,96 @@ int nova_dedup_crosscheck(struct nova_file_write_entry *entry,
 // TODO update 'update-count', 'reference-count'
 // TODO update 'dedup-flag' - inplace
 
-// Update FACT table + dedup_flags int write entry.
+// Find FACT-entry using index(of FACT)
+int nova_dedup_FACT_read(struct super_block *sb, u64 index)
+{
+	int j;
+	struct fact_entry *target;
+
+	u64 target_index = NOVA_DEF_BLOCK_SIZE_4K * FACT_TABLE_START + index * NOVA_FACT_ENTRY_SIZE;
+	target = (struct fact_entry *) nova_get_block(sb, target_index);
+
+	printk("is it 1?: %d \n", target->count);	///// ??!
+	for (j = 0; j < FINGERPRINT_SIZE; j++) {
+		printk("%02X", target->fingerprint[j]);
+	}
+	printk("\n");
+
+	return 0;
+}
+
+// Is FACT-entry empty?
+int nova_dedup_is_empty(struct fact_entry target)
+{
+	if (target.count == 0)
+		return 1;
+	return 0;
+}
+
+// Insert new FACT-entry.
+int nova_dedup_FACT_insert(struct super_block *sb, struct fingerprint_lookup_data *lookup)
+{
+	unsigned long irq_flags = 0;
+	struct fact_entry te;		// target entry.
+	struct fact_entry *pmem_te;	// PMEM target entry.
+	u64 index = 0;
+	int flag = 0;
+
+	index = lookup->fingerprint[0];
+	index = index << 8 | lookup->fingerprint[1];
+	index = index << 8 | lookup->fingerprint[2];				// Why assigning repeatedly ??? ///////////////
+
+	// Read entries until it finds a match or finds an empty slot.
+	do {
+		u64 target_index = NOVA_DEF_BLOCK_SIZE_4K * FACT_TABLE_START + index * NOVA_FACT_ENTRY_SIZE;
+		pmem_te = (struct fact_entry *) nova_get_block(sb, target_index);
+		__copy_to_user(&te, pmem_te, sizeof(struct fact_entry));	// What is the &te: not assigned!!! /////////////
+
+		if (strncmp(te.fingerprint, lookup->fingerprint, FINGERPRINT_SIZE) == 0) {
+			flag = 1;
+			break;
+		}
+		if (nova_dedup_is_empty(te)) {
+			flag = 0;
+			break;
+		}
+
+		// TODO add pointer to the entry and add a new entry at the end of fact table.
+
+	} while (0);
+
+	// duplicate Data-page detected.
+	if (flag) {
+		if ((te.count & ((1 << 5) - 1)) > (1 << 5)) {			// Is this calculation right??!!! /////////////////
+			printk("ERROR: more than 16 updates to this entry! \n");
+			return 1;
+		}
+		te.count ++;
+	}
+	// new entry should be written.
+	else {
+		strncpy(te.fingerprint, lookup->fingerprint, FINGERPRINT_SIZE);
+		te.block_address = lookup->block_address;
+		te.count = 1;	// set up the UpdateCount field.
+		te.next = 0;
+	}
+
+	// Copy target-entry to PMEM.
+	nova_memunlock_range(sb, pmem_te, CACHELINE_SIZE, &irq_flags);
+	memcpy_to_pmem_nocache(pmem_te, &te, sizeof(struct fact_entry) - 4);	// Do not WRITE on 'delete' field.
+	nova_memlock_range(sb, pmem_te, CACHELINE_SIZE, &irq_flags);
+
+	lookup->index = index;
+	lookup->block_address = te.block_address;
+	return 0;
+}
+
+// Update FACT table + dedup_flags in write entry.
 int nova_dedup_update_FACT(struct super_block *sb, struct nova_inode_info_header * sih, u64 begin_tail)
 {
 	void *addr;
 	struct nova_file_write_entry *entry;
-	struct nova_file_write_entry *entryc, entry_copy;
+	//struct nova_file_write_entry *entryc, entry_copy;
 	u64 curr_p = begin_tail;
 	size_t entry_size = sizeof(struct nova_file_write_entry);
 	unsigned long irq_flags = 0;
@@ -399,6 +482,7 @@ printk("Initialize buffer, and fingerprint\n");
 				}
 				//printk("\n");
 				//printk("%c %c %c\n", buf[0], buf[1], buf[2]);
+				lookup_data[i].block_address = nvmm;	// *** Assigining the block_address! *** //
 				index++;
 			}
 
@@ -410,7 +494,14 @@ printk("Initialize buffer, and fingerprint\n");
 			}
 
 			// TODO Lookup for duplicate datapages.
+			for (i = 0; i < num_pages; i++)
+				nova_dedup_FACT_insert(sb, &lookup_data[i]);
+
+			for (i = 0; i < num_pages; i++)
+				nova_dedup_FACT_read(sb, lookup_data[i].index);
+
 			// TODO add new 'FACT' entries.
+
 			// Construct lookup_data.
 
 			// For testing.

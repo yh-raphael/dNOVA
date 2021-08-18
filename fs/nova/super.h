@@ -51,10 +51,15 @@ struct nova_super_block {
  * Block 32 - 47 contain pointers to replica inode table.
  * Block 48 - 63 contain pointers to journal pages.
  *
+ * // NOVA DEDUP YhC //
+ * Block 64 - 327743 Static FACT (1280 MB)
+ *
  * If data protection is enabled, more blocks are reserverd for checksums and
  * parities and the number is derived according to the whole storage size.
  */
-#define	HEAD_RESERVED_BLOCKS	64
+//#define	HEAD_RESERVED_BLOCKS	64
+// NOVA DEDUP YhC //
+#define	HEAD_RESERVED_BLOCKS	327743
 #define	NUM_JOURNAL_PAGES	16
 
 #define SUPER_BLOCK_START       0 // Superblock
@@ -62,6 +67,9 @@ struct nova_super_block {
 #define	INODE_TABLE0_START	16 // inode table
 #define	INODE_TABLE1_START	32 // replica inode table
 #define	JOURNAL_START		48 // journal pointer table
+
+// NOVA DEDUP YhC //
+#define FACT_TABLE_START	64 // Fingerprint Address of data-page Consistency tagging Table.
 
 /* For replica super block and replica reserved inodes */
 #define	TAIL_RESERVED_BLOCKS	2

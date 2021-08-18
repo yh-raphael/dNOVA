@@ -125,7 +125,7 @@ static void nova_init_free_list(struct super_block *sb,
 {
 	struct nova_sb_info *sbi = NOVA_SB(sb);
 	unsigned long per_list_blocks;
-
+/*
 	per_list_blocks = sbi->num_blocks / sbi->cpus;
 
 	free_list->block_start = per_list_blocks * index;
@@ -133,6 +133,16 @@ static void nova_init_free_list(struct super_block *sb,
 					per_list_blocks - 1;
 	if (index == 0)
 		free_list->block_start += sbi->head_reserved_blocks;
+	if (index == sbi->cpus - 1)
+		free_list->block_end -= sbi->tail_reserved_blocks;
+*/
+	// NOVA DEDUP YhC //
+	per_list_blocks = (sbi->num_blocks - sbi->head_reserved_blocks) / sbi->cpus;
+
+	free_list->block_start = sbi->head_reserved_blocks + per_list_blocks * index;
+	free_list->block_end = free_list->block_start +
+					per_list_blocks - 1;
+
 	if (index == sbi->cpus - 1)
 		free_list->block_end -= sbi->tail_reserved_blocks;
 
