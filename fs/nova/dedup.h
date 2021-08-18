@@ -90,11 +90,12 @@ int nova_dedup_fingerprint (unsigned char *datapage, unsigned char *ret_fingerpr
 int nova_dedup_num_new_write_entry(short *target, int num_pages);
 int nova_dedup_crosscheck(struct nova_file_write_entry *entry, struct nova_inode_info_header *sih, unsigned long pgoff);
 
+int nova_dedup_FACT_update_count(struct super_block *sb, u64 index);
 int nova_dedup_FACT_read(struct super_block *sb, u64 index);
 int nova_dedup_is_empty(struct fact_entry target);
 int nova_dedup_FACT_insert(struct super_block *sb, struct fingerprint_lookup_data *lookup);
 
-int nova_dedup_update_FACT(struct super_block *sb, struct nova_inode_info_header * sih, u64 begin_tail);
+int nova_dedup_entry_update(struct super_block *sb, struct nova_inode_info_header * sih, u64 begin_tail);
 
 // Debugging function for testing.
 int nova_dedup_test (struct file*);

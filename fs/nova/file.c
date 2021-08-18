@@ -569,9 +569,10 @@ do_dax_mapping_read(struct file *filp, char __user *buf,
 
 		nvmm = get_nvmm(sb, sih, entryc, index);		// [yhc] Resolve the address of target position excluding super_block.
 
-	printk("Reading %u pages from entry %llu \n", entry->num_pages, entry->pgoff);
-	printk("Reading the time: %lld \n", inode->i_ctime.tv_sec);//???!
+	printk("Reading %u pages from datapage %lu", entry->num_pages, nvmm);
+	printk("Reading %u pages from pgoff %llu \n", entry->num_pages, entry->pgoff);
 	printk("index: %ld, nvmm: %ld \n", index, nvmm);
+	//printk("Reading the time: %lld \n", inode->i_ctime.tv_sec);//???!
 
 		dax_mem = nova_get_block(sb, (nvmm << PAGE_SHIFT));	// [yhc] Resolve the address of target block in PMEM.
 
@@ -640,7 +641,7 @@ static ssize_t nova_dax_file_read(struct file *filp, char __user *buf,
 	struct inode *inode = filp->f_mapping->host;
 	ssize_t res;
 	INIT_TIMING(dax_read_time);
-
+printk("--DAX_READ-- \n");
 	NOVA_START_TIMING(dax_read_t, dax_read_time);
 	inode_lock_shared(inode);
 	res = do_dax_mapping_read(filp, buf, len, ppos);			// [yhc] Mapping occurs here!
