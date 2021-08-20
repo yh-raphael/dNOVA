@@ -83,8 +83,6 @@ int nova_dedup_queue_init(void);
 int nova_dedup_queue_push(u64, u64);	// parameter added.
 u64 nova_dedup_queue_get_next_entry(u64 *);
 
-int nova_dedup_is_duplicate(struct super_block *sb, unsigned long blocknr);
-
 // Radix-tree for searching D-table entry related.
 //void nova_dedup_init_radix_tree_node (struct nova_dedup_radix_tree_node *, loff_t);
 
@@ -98,7 +96,7 @@ int nova_dedup_is_empty(struct fact_entry target);
 int nova_dedup_FACT_insert(struct super_block *sb, struct fingerprint_lookup_data *lookup);
 
 int nova_dedup_entry_update(struct super_block *sb, struct nova_inode_info_header * sih, u64 begin_tail);
-int nova_dedup_is_duplicate(struct super_block *sb, unsigned long blocknr);
+int nova_dedup_is_duplicate(struct super_block *sb, unsigned long blocknr, bool check);
 
 // Debugging function for testing.
 int nova_dedup_test (struct file*);

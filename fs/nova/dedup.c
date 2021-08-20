@@ -206,6 +206,44 @@ int nova_dedup_reassign_file_tree(struct super_block *sb, struct nova_inode_info
 	return 0;
 }
 
+int nova_dedup_invalidate_target_entry(struct super_block *sb, 
+		struct nova_inode_info_header *sih, struct nova_file_write_entry *target_entry)
+{
+	unsigned long start_pgoff = target_entry->pgoff;
+	unsigned int num = target_entry->num_pages;
+	unsigned int num_free = 0;
+	unsigned long curr_pgoff;
+	unsigned long start_blocknr = (target_entry->block) >> PAGE_SHIFT;
+	unsigned long curr_blocknr;
+	// Free Data pages that are duplicate
+	// Invalidate Target Entry
+	// radix_tree_replace_slot
+
+	int i;
+	int ret = 0;
+	INIT_TIMING(assign_time);
+
+	NOVA_START_TIMING(assign_t, assign_time);
+	for (i = 0; i < num; i++) { 
+		curr_pgoff = start_pgoff + i;
+		curr_blocknr = start_blocknr + i;
+
+		// duplicate: Free (not inside dedup table)
+		if (nova_dedup_is_duplicate(sb, curr_blocknr, true) == 2)
+			nova_free_old_entry(sb, sih,target_entry,
+					curr_pgoff, 1, false, target_entry->epoch_id);
+		// unique: Don't Free
+		else
+			nova_invalidate_write_entry(sb, target_entry, 1, 1);
+	} 
+
+	nova_invalidate_write_entry(sb, target_entry, 1, 0);
+out:
+	NOVA_END_TIMING(assign_t, assign_time);
+	return ret;
+}
+
+
 // === Functions for FACT === //
 int nova_dedup_FACT_update_count(struct super_block *sb, u64 index)
 {
@@ -410,7 +448,7 @@ int nova_dedup_entry_update(struct super_block *sb, struct nova_inode_info_heade
 
 // Check whether target block has multiple ReferenceCount.
 // Return value - 0: it's not okay to delete, 1: it's okay to delete
-int nova_dedup_is_duplicate(struct super_block *sb, unsigned long blocknr)
+int nova_dedup_is_duplicate(struct super_block *sb, unsigned long blocknr, bool check)
 {
 	unsigned long irq_flags = 0;
 	struct fact_entry te;		// target entry.
@@ -432,21 +470,23 @@ int nova_dedup_is_duplicate(struct super_block *sb, unsigned long blocknr)
 
 	ret = te.count >> 4;
 
-	if (ret < 0) {
-		printk("ERROR: referenceCount couldn't be less than 1! \n");
-		return 1;
+	if (ret <= 0) {
+		printk("ERROR: Block is not in FACT! \n");
+		return 2;
 	}
 	else {
-//		te.count -= 16;	// MAYBE bug!@_@
+		if (!check) {
+//			te.count -= 16;	// MAYBE bug!@_@
 
-		nova_memunlock_range(sb, pmem_te, NOVA_FACT_ENTRY_SIZE, &irq_flags);
-		memcpy_to_pmem_nocache(pmem_te, &te, NOVA_FACT_ENTRY_SIZE - 4);	// Do not WRITE on 'delete' field.
-		nova_memlock_range(sb, pmem_te, NOVA_FACT_ENTRY_SIZE, &irq_flags);
+			nova_memunlock_range(sb, pmem_te, NOVA_FACT_ENTRY_SIZE, &irq_flags);
+			memcpy_to_pmem_nocache(pmem_te, &te, NOVA_FACT_ENTRY_SIZE - 4);	// Do not WRITE on 'delete' field.
+			nova_memlock_range(sb, pmem_te, NOVA_FACT_ENTRY_SIZE, &irq_flags);
 
-		if (ret == 1)
-			return 1;	// referenceCount == 1.
-		else
-			return 0;	// referenceCount >= 2.
+			if (ret == 1)
+				return 1;	// referenceCount == 1.
+			else
+				return 0;	// referenceCount >= 2.
+		}
 	}
 
 }
@@ -820,6 +860,10 @@ printk("Initialize buffer, and fingerprint\n");
 			if (ret)
 				goto out;
 
+			ret = nova_dedup_invalidate_target_entry(sb, target_sih, target_entry);
+			if (ret)
+				goto out;
+
 			target_inode->i_blocks = target_sih->i_blocks;
 out:
 			if (ret < 0)
@@ -833,13 +877,12 @@ out:
 			kfree(lookup_data);
 			kfree(duplicate_check);
 			//kfree(target_inode);
-			iput(target_inode);	// ??!
-			
-			printk("---------- DEDUP completed ----------\n");
+			iput(target_inode);	// ??!	
 		}
 		else {
 			printk("no entry \n");
 		}
+		printk("---------- DEDUP completed ----------\n");
 	} while (0);
 
 	// DEDUP-TABLE should be updated.
