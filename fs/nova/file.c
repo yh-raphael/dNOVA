@@ -811,7 +811,7 @@ printk("after copied: %ld\n",copied);
 		else								//[yc] just overwriting case.
 			file_size = cpu_to_le64(inode->i_size);
 
-printk("WRITE: write %lu(allocated) pages from %lu(start_blk) \n", allocated, start_blk);
+printk("WRITE: write %u(allocated) pages from %lu(start_blk) \n", allocated, start_blk);
 		nova_init_file_write_entry(sb, sih, &entry_data, epoch_id,
 					start_blk, allocated, blocknr, time,
 					file_size);				// [yhc] Initializing 'file write entry'.

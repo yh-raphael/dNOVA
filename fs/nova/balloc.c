@@ -27,6 +27,7 @@
 #include <linux/bitops.h>
 #include "nova.h"
 #include "inode.h"
+#include "dedup.h"
 
 int nova_alloc_block_free_lists(struct super_block *sb)
 {
@@ -397,6 +398,12 @@ static int nova_free_blocks(struct super_block *sb, unsigned long blocknr,
 	struct rb_root *tree;
 	unsigned long block_low;
 	unsigned long block_high;
+
+	// NOVA DEDUP YhC //
+	unsigned long t_block_low;
+	unsigned long t_block_high;
+	int i;
+
 	unsigned long num_blocks = 0;
 	struct nova_range_node *prev = NULL;
 	struct nova_range_node *next = NULL;
@@ -405,6 +412,7 @@ static int nova_free_blocks(struct super_block *sb, unsigned long blocknr,
 	int cpuid;
 	int new_node_used = 0;
 	int ret;
+
 	INIT_TIMING(free_time);
 
 	if (num <= 0) {
@@ -427,11 +435,15 @@ static int nova_free_blocks(struct super_block *sb, unsigned long blocknr,
 	}
 
 	free_list = nova_get_free_list(sb, cpuid);
-	spin_lock(&free_list->s_lock);
-
-	tree = &(free_list->block_free_tree);
-
+//	spin_lock(&free_list->s_lock);
 	num_blocks = nova_get_numblocks(btype) * num;
+	t_block_low = blocknr;
+	t_block_high = blocknr + num_blocks - 1;
+
+//	tree = &(free_list->block_free_tree);
+	block_low = block_high = 0;
+
+/*	num_blocks = nova_get_numblocks(btype) * num;
 	block_low = blocknr;
 	block_high = blocknr + num_blocks - 1;
 
@@ -448,73 +460,162 @@ static int nova_free_blocks(struct super_block *sb, unsigned long blocknr,
 		ret = -EIO;
 		goto out;
 	}
+*/
 
-	ret = nova_find_free_slot(tree, block_low,
-					block_high, &prev, &next);
+	// NOVA DEDUP //
+	for(i=t_block_low; i<=t_block_high;i++){
+		if(nova_dedup_is_duplicate(sb, i) == 1){
+			block_low = t_block_low;
+			block_high = i;
+			if(i != t_block_high)
+				continue;
+		}
+		else{
+			t_block_low = i+1;
+			if(block_low == block_high && block_low == 0)
+				continue;
+		}	
 
-	if (ret) {
-		nova_dbg("%s: find free slot fail: %d\n", __func__, ret);
-		goto out;
-	}
+//	ret = nova_find_free_slot(tree, block_low,
+//					block_high, &prev, &next);
 
-	if (prev && next && (block_low == prev->range_high + 1) &&
-			(block_high + 1 == next->range_low)) {
+//	if (ret) {
+//		nova_dbg("%s: find free slot fail: %d\n", __func__, ret);
+//		goto out;
+//	}
+
+		spin_lock(&free_list->s_lock);
+		tree = &(free_list->block_free_tree);
+
+//	if (prev && next && (block_low == prev->range_high + 1) &&
+//			(block_high + 1 == next->range_low)) {
 		/* fits the hole */
-		rb_erase(&next->node, tree);
-		free_list->num_blocknode--;
-		prev->range_high = next->range_high;
-		nova_update_range_node_checksum(prev);
-		if (free_list->last_node == next)
-			free_list->last_node = prev;
-		nova_free_blocknode(next);
-		goto block_found;
-	}
-	if (prev && (block_low == prev->range_high + 1)) {
+//		rb_erase(&next->node, tree);
+//		free_list->num_blocknode--;
+//		prev->range_high = next->range_high;
+//		nova_update_range_node_checksum(prev);
+//		if (free_list->last_node == next)
+//			free_list->last_node = prev;
+//		nova_free_blocknode(next);
+//		goto block_found;
+//	}
+//	if (prev && (block_low == prev->range_high + 1)) {
 		/* Aligns left */
-		prev->range_high += num_blocks;
-		nova_update_range_node_checksum(prev);
-		goto block_found;
-	}
-	if (next && (block_high + 1 == next->range_low)) {
+//		prev->range_high += num_blocks;
+//		nova_update_range_node_checksum(prev);
+//		goto block_found;
+//	}
+//	if (next && (block_high + 1 == next->range_low)) {
 		/* Aligns right */
-		next->range_low -= num_blocks;
-		nova_update_range_node_checksum(next);
-		goto block_found;
-	}
+//		next->range_low -= num_blocks;
+//		nova_update_range_node_checksum(next);
+//		goto block_found;
+//	}
+
+		//num_blocks = nova_get_numblocks(btype) * num;
+		//block_low = blocknr;
+		//block_high = blocknr + num_blocks - 1;
+
+		nova_dbgv("Free: %lu - %lu\n", block_low, block_high);
+
+		if (blocknr < free_list->block_start ||
+				blocknr + num > free_list->block_end + 1) {
+			nova_err(sb, "free blocks %lu to %lu, free list %d, "
+					"start %lu, end %lu\n",
+					blocknr, blocknr + num - 1,
+					free_list->index,
+					free_list->block_start,
+					free_list->block_end);
+			ret = -EIO;
+			goto out;
+		}
 
 	/* Aligns somewhere in the middle */
-	curr_node->range_low = block_low;
-	curr_node->range_high = block_high;
-	nova_update_range_node_checksum(curr_node);
-	new_node_used = 1;
-	ret = nova_insert_blocktree(tree, curr_node);
-	if (ret) {
-		new_node_used = 0;
-		goto out;
-	}
-	if (!prev)
-		free_list->first_node = curr_node;
-	if (!next)
-		free_list->last_node = curr_node;
+//	curr_node->range_low = block_low;
+//	curr_node->range_high = block_high;
+//	nova_update_range_node_checksum(curr_node);
+//	new_node_used = 1;
+//	ret = nova_insert_blocktree(tree, curr_node);
+//	if (ret) {
+//		new_node_used = 0;
+//		goto out;
+//	}
+//	if (!prev)
+//		free_list->first_node = curr_node;
+//	if (!next)
+//		free_list->last_node = curr_node;
 
-	free_list->num_blocknode++;
+		ret = nova_find_free_slot(tree, block_low,
+				block_high, &prev, &next);
+
+//	free_list->num_blocknode++;
+
+		if (ret) {
+			nova_dbg("%s: find free slot fail: %d\n", __func__, ret);
+			goto out;
+		}
+
+		if (prev && next && (block_low == prev->range_high + 1) &&
+				(block_high + 1 == next->range_low)) {
+			/* fits the hole */
+			rb_erase(&next->node, tree);
+			free_list->num_blocknode--;
+			prev->range_high = next->range_high;
+			nova_update_range_node_checksum(prev);
+			if (free_list->last_node == next)
+				free_list->last_node = prev;
+			nova_free_blocknode(next);
+			goto block_found;
+		}
+		if (prev && (block_low == prev->range_high + 1)) {
+			/* Aligns left */
+			prev->range_high += num_blocks;
+			nova_update_range_node_checksum(prev);
+			goto block_found;
+		}
+		if (next && (block_high + 1 == next->range_low)) {
+			/* Aligns right */
+			next->range_low -= num_blocks;
+			nova_update_range_node_checksum(next);
+			goto block_found;
+		}
+
+		/* Aligns somewhere in the middle */
+		curr_node->range_low = block_low;
+		curr_node->range_high = block_high;
+		nova_update_range_node_checksum(curr_node);
+		new_node_used = 1;
+		ret = nova_insert_blocktree(tree, curr_node);
+		if (ret) {
+			new_node_used = 0;
+			goto out;
+		}
+		if (!prev)
+			free_list->first_node = curr_node;
+		if (!next)
+			free_list->last_node = curr_node;
+
+		free_list->num_blocknode++;
 
 block_found:
-	free_list->num_free_blocks += num_blocks;
+		free_list->num_free_blocks += num_blocks;
 
-	if (log_page) {
-		free_list->free_log_count++;
-		free_list->freed_log_pages += num_blocks;
-	} else {
-		free_list->free_data_count++;
-		free_list->freed_data_pages += num_blocks;
-	}
+		if (log_page) {
+			free_list->free_log_count++;
+			free_list->freed_log_pages += num_blocks;
+		} else {
+			free_list->free_data_count++;
+			free_list->freed_data_pages += num_blocks;
+		}
 
 out:
-	spin_unlock(&free_list->s_lock);
-	if (new_node_used == 0)
-		nova_free_blocknode(curr_node);
+		spin_unlock(&free_list->s_lock);
+		if (new_node_used == 0)
+			nova_free_blocknode(curr_node);
 
+		block_low = 0;
+		block_high = 0;
+	}
 	NOVA_END_TIMING(free_blocks_t, free_time);
 	return ret;
 }
