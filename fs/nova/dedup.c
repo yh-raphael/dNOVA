@@ -695,7 +695,7 @@ printk("Initialize buffer, and fingerprint\n");
 
 				// Print Fingerprint.
 				for (j = 0; j < FINGERPRINT_SIZE; j++) {
-					//printk("%d: %02X \n", j, fingerprint[j]);
+					printk("%d: %02X \n", j, fingerprint[j]);
 					//printk("%08x", fingerprint[j]);
 					lookup_data[i].fingerprint[j] = fingerprint[j];
 				}

@@ -685,8 +685,24 @@ static ssize_t do_nova_cow_file_write(struct file *filp,
 	u64 epoch_id;
 	u32 time;
 	unsigned long irq_flags = 0;
-//DEDUP//
+
+	// DEDUP //
 //unsigned char digest[40];
+	unsigned char *fingerprint;
+	unsigned char *dbuf;
+	int i;
+	struct fingerprint_lookup_data lookup_data;
+	unsigned long nvmm;
+	
+	fingerprint = kmalloc(FINGERPRINT_SIZE, GFP_KERNEL);
+	dbuf = kmalloc(DATABLOCK_SIZE, GFP_KERNEL);
+
+	memset(fingerprint, 0, FINGERPRINT_SIZE);
+	memset(dbuf, 0, DATABLOCK_SIZE);
+
+//for (i = 0; i < FINGERPRINT_SIZE; i++)
+//	printk("%d: %02X \n", i, fingerprint[i]);
+	// DEDUP //
 
 	if (len == 0)
 		return 0;
@@ -705,7 +721,10 @@ printk("starting offset: %lld \n", pos);	//[yc].
 	count = len;						// [yhc] 'count' saves the input length info.
 printk("count : %ld \n",count);
 printk("pos : %lld \n",pos);
+printk("sih->pi_addr: %ld \n", sih->pi_addr);
 	pi = nova_get_block(sb, sih->pi_addr);			// [yhc] pi_addr: address in PMEM of an inode.
+printk("pi(lld): %lld \n", pi);
+printk("pi(p)  : %p \n", pi);
 
 	/* nova_inode tail pointer will be updated and we make sure all other
 	 * inode fields are good before checksumming the whole structure
@@ -763,6 +782,11 @@ printk("writing - file offset %lld \n", pos);
 		allocated = nova_new_data_blocks(sb, sih, &blocknr, start_blk,
 				 num_blocks, ALLOC_NO_INIT, ANY_CPU,
 				 ALLOC_FROM_HEAD);
+
+		// DEDUP //
+		allocated = 1;		// [YhC] 1 Data-page per Write-entry.
+		// DEDUP //
+printk("blocknr: %d \n", blocknr);
 printk("allocated: %d\n", allocated);
 		nova_dbg_verbose("%s: alloc %d blocks @ %lu\n", __func__,
 						allocated, blocknr);
@@ -788,6 +812,24 @@ printk("allocated: %d\n", allocated);
 			if (ret)
 				goto out;
 		}
+
+		// DEDUP //
+//		memcpy(dbuf, buf, DATABLOCK_SIZE);
+		copy_from_user(dbuf, buf, DATABLOCK_SIZE);
+		nova_dedup_fingerprint(dbuf, fingerprint);	// [YhC] Fingerprinting.
+
+		for (i = 0; i < FINGERPRINT_SIZE; i++) {
+			printk("%d: %02X \n", i, fingerprint[i]);
+			lookup_data.fingerprint[i] = fingerprint[i];
+		}
+
+
+//		lookup_data.block_address = ;
+//		nova_dedup_FACT_insert(sb, );
+
+
+		// DEDUP //
+
 		/* Now copy from user buf */
 		//		nova_dbg("Write: %p\n", kmem);
 printk("bytes: %ld\n", bytes);
@@ -884,6 +926,10 @@ out:
 
 	if (try_inplace)
 		return do_nova_inplace_file_write(filp, buf, len, ppos);
+
+	// DEDUP //
+	kfree(fingerprint);
+	// DEDUP //
 
 	return ret;
 }
